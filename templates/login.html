@@ -1,0 +1,297 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login Profissional - IBKR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #00a859; /* Verde Vibrante */
+            --secondary: #ffcc00; /* Dourado */
+            --dark: #1a1a1a;
+            --light-bg: #ffffff;
+            --glass-white: rgba(255, 255, 255, 0.8);
+        }
+
+        /* REMOVE APENAS A ROLAGEM HORIZONTAL, MANTÉM A VERTICAL LIVRE */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden; /* Trava o balanço lateral */
+            overflow-y: auto;   /* Garante a roleta vertical */
+            position: relative;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at top right, #ffffff, #f1f1f1);
+            color: var(--dark);
+        }
+
+        /* BARRA SUPERIOR */
+        .top-nav {
+            width: 100%;
+            max-width: 100vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            box-sizing: border-box;
+            position: relative; 
+            top: 0;
+        }
+
+        .logo-img {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -1px;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .nav-link-register {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9em;
+            padding: 8px 16px;
+            border: 1px solid var(--primary);
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-link-register:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* CONTAINER PRINCIPAL COMPACTO */
+        .login-container {
+            margin-top: 40px;
+            margin-bottom: 40px;
+            background: var(--glass-white);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.5);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        /* FORMULÁRIO */
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            color: #666;
+            margin-left: 5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .input-wrapper i.main-icon {
+            position: absolute;
+            left: 15px;
+            color: #aaa;
+            font-size: 1.1rem;
+            transition: 0.3s;
+            z-index: 5;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 1.5px solid #eee;
+            border-radius: 12px;
+            background: #f9f9f9;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .auth-form input:focus {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 168, 89, 0.1);
+        }
+
+        .auth-form input:focus + i.main-icon {
+            color: var(--primary);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            cursor: pointer;
+            color: #bbb;
+            z-index: 5;
+        }
+
+        /* BOTÃO ENTRAR */
+        .submit-button {
+            width: 100%;
+            padding: 16px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #00a859 0%, #008f4c 100%);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 10px 20px rgba(0, 168, 89, 0.2);
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px rgba(0, 168, 89, 0.3);
+        }
+
+        /* ERROS */
+        .errorlist {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+            color: #ff4d4f;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        /* RESPONSIVIDADE */
+        @media (max-width: 480px) {
+            .top-nav { padding: 15px 20px; }
+            .login-container { 
+                padding: 30px 20px; 
+                width: 92%;
+                margin-top: 20px;
+            }
+            .logo-img { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="logo-img">IBKR</div>
+        <a href="{% url 'cadastro' %}" class="nav-link-register">Criar Conta</a>
+    </nav>
+
+    <div class="login-container">
+        <div class="header">
+            <h2>Bem-vindo de volta</h2>
+        </div>
+        
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <ul class="errorlist">
+                    {% for error in form.non_field_errors %}
+                        <li><i class="fas fa-circle-exclamation"></i> {{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <div class="form-group">
+                <label>Telefone</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-phone-flip main-icon"></i>
+                    {{ form.username }}
+                </div>
+                {% if form.username.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.username.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label>Senha</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-shield-halved main-icon"></i>
+                    {{ form.password }}
+                    <i class="fa-regular fa-eye toggle-password" id="togglePassword"></i>
+                </div>
+                {% if form.password.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.password.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <button type="submit" class="submit-button">
+                <span>Entrar</span>
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.querySelector('#togglePassword');
+            const passwordInput = document.querySelector('input[name="password"]');
+
+            if (togglePassword && passwordInput) {
+                togglePassword.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    this.classList.toggle('fa-eye');
+                    this.classList.toggle('fa-eye-slash');
+                });
+            }
+
+            const phoneInput = document.querySelector('input[name="username"]');
+            if (phoneInput) phoneInput.setAttribute('placeholder', '941 000 000');
+            
+            const passInput = document.querySelector('input[name="password"]');
+            if (passInput) passInput.setAttribute('placeholder', '••••••••');
+        });
+    </script>
+</body>
+</html>

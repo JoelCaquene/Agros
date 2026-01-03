@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}IBKR - Forex Mining Terminal{% endblock %}
+
+{% block content %}
+<div id="welcomeModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="brand-logo-pop">IBKR</div>
+            <h2>Bem-vindo à Revolução Forex</h2>
+        </div>
+        <div class="modal-body">
+            <p class="intro-p">A <strong>IBKR</strong> é uma empresa líder em operações online no mercado Forex.</p>
+            
+            <div class="benefits-list">
+                <p>Após o seu depósito de garantia, você terá acesso a:</p>
+                <div class="benefit-item">
+                    <i class="fas fa-file-contract"></i>
+                    <span>1. Seu Certificado de Investimento Oficial</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-credit-card"></i>
+                    <span>2. Seu Cartão de Uso Pessoal Exclusivo</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-tshirt"></i>
+                    <span>3. Uma Camisa Oficial da Equipa IBKR</span>
+                </div>
+            </div>
+
+            <div class="support-area">
+                <p>Para mais informações, visite nosso canal oficial:</p>
+                <a href="{{ whatsapp_link }}" target="_blank" class="btn-whatsapp-pop">
+                    <i class="fab fa-whatsapp"></i> CANAL DE APOIO IBKR
+                </a>
+            </div>
+        </div>
+        <button class="btn-close-modal" onclick="closeModal()">Entendido</button>
+    </div>
+</div>
+
+<div class="forex-dashboard">
+
+    {# 1. Banner Superior #}
+    <div class="trading-header">
+        <div class="forex-chart-bg">
+            <div class="chart-overlay">
+                <h1 class="brand-title">IBKR</h1>
+                <p class="brand-subtitle">SMART FOREX TRADING</p>
+            </div>
+        </div>
+    </div>
+
+    {# 2. Botões de Ação Rápida #}
+    <div class="action-grid">
+        <a href="{% url 'deposito' %}" class="action-btn btn-blue">
+            <i class="fas fa-wallet"></i>
+            <span>Depósito</span>
+        </a>
+        <a href="{% url 'tarefa' %}" class="action-btn btn-teal">
+            <i class="fas fa-tasks"></i>
+            <span>Missão</span>
+        </a>
+        <a href="{% url 'roleta' %}" class="action-btn btn-yellow">
+            <i class="fas fa-clover"></i>
+            <span>Roleta</span>
+        </a>
+        <a href="{% url 'sobre' %}" class="action-btn btn-purple">
+            <i class="fas fa-info-circle"></i>
+            <span>Sobre</span>
+        </a>
+    </div>
+
+    {# 3. Lista de Moedas Estilo Binance #}
+    <div class="market-section">
+        <div class="market-header-list">
+            <span>Par de Moedas</span>
+            <span>Preço Live</span>
+            <span>24h %</span>
+        </div>
+        
+        <div class="crypto-list">
+            <div class="crypto-item">
+                <div class="coin-info">
+                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" width="20">
+                    <div><strong>BTC</strong>/USDT</div>
+                </div>
+                <div class="coin-price" id="btc-price">43,120.50</div>
+                <div class="coin-change pos">+2.45%</div>
+            </div>
+
+            <div class="crypto-item">
+                <div class="coin-info">
+                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" width="20">
+                    <div><strong>ETH</strong>/USDT</div>
+                </div>
+                <div class="coin-price" id="eth-price">2,245.10</div>
+                <div class="coin-change pos">+1.12%</div>
+            </div>
+
+            <div class="crypto-item">
+                <div class="coin-info">
+                    <img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" width="20">
+                    <div><strong>BNB</strong>/USDT</div>
+                </div>
+                <div class="coin-price" id="bnb-price">312.45</div>
+                <div class="coin-change neg">-0.54%</div>
+            </div>
+
+            <div class="crypto-item">
+                <div class="coin-info">
+                    <img src="https://cryptologos.cc/logos/solana-sol-logo.png" width="20">
+                    <div><strong>SOL</strong>/USDT</div>
+                </div>
+                <div class="coin-price" id="sol-price">98.22</div>
+                <div class="coin-change pos">+5.80%</div>
+            </div>
+            
+            <div class="crypto-item">
+                <div class="coin-info">
+                    <img src="https://cryptologos.cc/logos/xrp-xrp-logo.png" width="20">
+                    <div><strong>XRP</strong>/USDT</div>
+                </div>
+                <div class="coin-price">0.5241</div>
+                <div class="coin-change neg">-1.20%</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{# 4. Barra de Navegação Inferior #}
+<nav class="trading-nav">
+    <a href="{% url 'home' %}" class="nav-link active">
+        <i class="fas fa-home"></i>
+        <span>Início</span>
+    </a>
+    <a href="{% url 'nivel' %}" class="nav-link">
+        <i class="fas fa-bolt"></i>
+        <span>Nível</span>
+    </a>
+    <a href="{% url 'renda' %}" class="nav-link">
+        <i class="fas fa-chart-line"></i>
+        <span>Renda</span>
+    </a>
+    <a href="{% url 'equipa' %}" class="nav-link">
+        <i class="fas fa-users"></i>
+        <span>Equipa</span>
+    </a>
+    <a href="{% url 'perfil' %}" class="nav-link">
+        <i class="fas fa-user-cog"></i>
+        <span>Perfil</span>
+    </a>
+</nav>
+
+<style>
+    :root {
+        --bg-dark: #060d17;
+        --card-dark: #121b28;
+        --accent-blue: #00a8ff;
+        --accent-green: #00ff88;
+        --accent-red: #ff4d4d;
+        --text-gray: #8a94a6;
+    }
+
+    /* ESTILOS DO POP-UP (MODAL) */
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        display: flex; justify-content: center; align-items: center;
+        z-index: 9999;
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+        background: #fff;
+        width: 90%;
+        max-width: 350px;
+        border-radius: 20px;
+        padding: 25px;
+        text-align: center;
+        color: #333;
+        animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .brand-logo-pop {
+        background: #00004d;
+        color: white;
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 8px;
+        font-weight: 900;
+        margin-bottom: 10px;
+    }
+
+    .modal-header h2 { font-size: 1.3rem; color: #00004d; margin-bottom: 15px; }
+    .intro-p { font-size: 0.9rem; margin-bottom: 15px; line-height: 1.4; }
+
+    .benefits-list {
+        text-align: left;
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+
+    .benefits-list p { font-weight: bold; font-size: 0.85rem; margin-bottom: 10px; color: #000; }
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+        font-size: 0.85rem;
+    }
+
+    .benefit-item i { color: #4CAF50; width: 20px; }
+
+    .btn-whatsapp-pop {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: #25d366;
+        color: white;
+        text-decoration: none;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: bold;
+        font-size: 0.9rem;
+        transition: 0.3s;
+    }
+
+    .btn-close-modal {
+        margin-top: 15px;
+        background: #eee;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        color: #666;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    /* ESTILOS ORIGINAIS DO DASHBOARD */
+    body {
+        background-color: var(--bg-dark) !important;
+        color: white !important;
+        font-family: 'Segoe UI', sans-serif;
+        margin: 0;
+        padding-bottom: 90px;
+    }
+
+    .trading-header {
+        position: relative;
+        height: 160px;
+        background: #000;
+    }
+
+    .forex-chart-bg {
+        width: 100%; height: 100%;
+        background-image: url('https://img.freepik.com/free-vector/trading-chart-blue-background-with-financial-data_1017-31741.jpg');
+        background-size: cover; background-position: center;
+        opacity: 0.5;
+    }
+
+    .chart-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(180deg, transparent 0%, var(--bg-dark) 100%);
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+    }
+
+    .brand-title { font-size: 38px; font-weight: 900; letter-spacing: 5px; margin: 0; color: #fff; }
+    .brand-subtitle { font-size: 10px; color: var(--accent-blue); letter-spacing: 3px; }
+
+    .action-grid {
+        display: grid; 
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px; 
+        padding: 20px 15px;
+        position: relative;
+        z-index: 10;
+    }
+    
+    .action-btn {
+        aspect-ratio: 1/1; 
+        border-radius: 15px;
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center;
+        text-decoration: none; 
+        color: white; 
+        font-size: 11px; 
+        font-weight: bold;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    .action-btn i { font-size: 22px; margin-bottom: 6px; }
+    .btn-blue { background: #0097e6; }
+    .btn-teal { background: #00cbcb; }
+    .btn-yellow { background: #ffc107; }
+    .btn-purple { background: #8e44ad; }
+
+    .market-section { margin-top: 10px; padding: 0 15px; }
+    .market-header-list {
+        display: flex; justify-content: space-between;
+        padding: 10px 5px; font-size: 11px; color: var(--text-gray);
+        border-bottom: 1px solid #1e2a3a;
+    }
+    .crypto-item {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 15px 5px; border-bottom: 1px solid #121b28;
+    }
+    .coin-info { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .coin-price { font-family: monospace; font-weight: bold; font-size: 14px; }
+    .coin-change {
+        padding: 5px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; min-width: 65px; text-align: center;
+    }
+    .pos { background: rgba(0, 255, 136, 0.1); color: var(--accent-green); }
+    .neg { background: rgba(255, 77, 77, 0.1); color: var(--accent-red); }
+
+    .trading-nav {
+        position: fixed; bottom: 0; width: 100%; height: 75px;
+        background: #0a1420; border-top: 1px solid #1e2a3a;
+        display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+    }
+    .nav-link {
+        text-decoration: none; color: #576574;
+        display: flex; flex-direction: column; align-items: center; font-size: 10px;
+    }
+    .nav-link i { font-size: 22px; margin-bottom: 4px; }
+    .nav-link.active { color: #00a8ff; }
+</style>
+
+<script>
+    // Função para fechar o Pop-up
+    function closeModal() {
+        document.getElementById('welcomeModal').style.display = 'none';
+    }
+
+    // Script de atualização de preços (Original)
+    setInterval(() => {
+        const prices = ['btc-price', 'eth-price', 'bnb-price', 'sol-price'];
+        const id = prices[Math.floor(Math.random() * prices.length)];
+        const el = document.getElementById(id);
+        if(!el) return;
+        let val = parseFloat(el.innerText.replace(',', ''));
+        let change = (Math.random() * 2 - 1) * 0.2;
+        el.innerText = (val + change).toLocaleString(undefined, {minimumFractionDigits: 2});
+        el.style.color = change > 0 ? '#00ff88' : '#ff4d4d';
+        setTimeout(() => el.style.color = 'white', 600);
+    }, 2000);
+</script>
+{% endblock %}

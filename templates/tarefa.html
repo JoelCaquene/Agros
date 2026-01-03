@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Forex Mining - Trading Terminal{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<div class="forex-terminal">
+    {# A. HEADER PROFISSIONAL #}
+    <div class="terminal-header">
+        <div class="status-indicator">
+            <span class="live-dot"></span>
+            <span class="status-text">LIVE MARKET DATA</span>
+        </div>
+        <div class="market-info">
+            <span class="pair">EUR/USD <i class="fa-solid fa-chart-line"></i></span>
+            <span class="price" id="live-price">1.08420</span>
+        </div>
+    </div>
+
+    {% if not has_active_level %}
+    {# B. ESTADO BLOQUEADO (NÍVEL INATIVO) #}
+    <div class="locked-container">
+        <div class="lock-card">
+            <i class="fa-solid fa-shield-halved lock-icon"></i>
+            <h2>Terminal Desconectado</h2>
+            <p>Seu acesso ao mercado global está restrito. Adquira um plano de mineração para iniciar operações.</p>
+            <div class="alert-box">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>STATUS: NÃO TENS AUTORIZAÇÃO, CONTACTA PRIMEIRO ADMINISTRADOR</span>
+            </div>
+        </div>
+    </div>
+    {% else %}
+        
+        {# C. AREA DE ANALISE (GRAFICOS) #}
+        <div class="analysis-section">
+            <div id="chart-timeline"></div>
+        </div>
+
+        {# D. CONTAINER DE MINERAÇÃO (A TAREFA) #}
+        <div class="mining-card">
+            <div class="mining-stats">
+                <div class="stat-item">
+                    <span class="label">VOLATILIDADE</span>
+                    <span class="value high">ALTA</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">CONEXÃO</span>
+                    <span class="value secure">ENCRIPTADA</span>
+                </div>
+            </div>
+
+            <div class="display-screen">
+                <div class="scan-line"></div>
+                <p id="task-message">SISTEMA PRONTO PARA MINERAÇÃO FOREX</p>
+                <div class="progress-container" id="progress-bar-container" style="display: none;">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <div class="status-lights">
+                    <div class="light" id="light-red" title="Aguardando"></div>
+                    <div class="light" id="light-yellow" title="Processando"></div>
+                    <div class="light" id="light-green" title="Concluído"></div>
+                </div>
+                
+                <button id="work-button" class="mining-btn">
+                    <i class="fa-solid fa-microchip"></i> 
+                    <span>MINERAÇÃO FOREX</span>
+                </button>
+            </div>
+        </div>
+
+        {# E. MENSAGENS DJANGO #}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="toast-message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // --- LÓGICA DO GRÁFICO (FOREX STYLE) ---
+                var options = {
+                    series: [{ data: [] }],
+                    chart: {
+                        type: 'area',
+                        height: 200, // Ajustado para telas menores
+                        toolbar: { show: false },
+                        animations: { enabled: true, easing: 'linear', dynamicAnimation: { speed: 1000 } }
+                    },
+                    colors: ['#00ff88'],
+                    fill: {
+                        type: 'gradient',
+                        gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 }
+                    },
+                    dataLabels: { enabled: false },
+                    stroke: { curve: 'smooth', width: 2 },
+                    xaxis: { labels: { show: false }, axisBorder: { show: false } },
+                    yaxis: { labels: { show: false } },
+                    grid: { borderColor: '#1a2637' }
+                };
+
+                var chart = new ApexCharts(document.querySelector("#chart-timeline"), options);
+                chart.render();
+
+                function updateChart() {
+                    let newData = [];
+                    for(let i=0; i<15; i++) {
+                        newData.push(Math.floor(Math.random() * (100 - 40) + 40));
+                    }
+                    chart.updateSeries([{ data: newData }]);
+                    const price = (1.08 + Math.random() * 0.01).toFixed(5);
+                    document.getElementById('live-price').innerText = price;
+                }
+                setInterval(updateChart, 3000);
+                updateChart();
+
+                // --- LÓGICA DE TAREFAS (DJANGO INTEGRATION) ---
+                const workButton = document.getElementById('work-button');
+                const taskMessage = document.getElementById('task-message');
+                const lightRed = document.getElementById('light-red');
+                const lightYellow = document.getElementById('light-yellow');
+                const lightGreen = document.getElementById('light-green');
+                const progressContainer = document.getElementById('progress-bar-container');
+                const progressFill = document.getElementById('progress-fill');
+
+                let tasksCompletedToday = {{ tasks_completed_today|default:0 }}; 
+                let maxTasks = {{ max_tasks|default:1 }};
+
+                function updateUI(status) {
+                    lightRed.className = 'light';
+                    lightYellow.className = 'light';
+                    lightGreen.className = 'light';
+
+                    if (status === 'idle') {
+                        lightRed.classList.add('red', 'pulse');
+                        workButton.disabled = false;
+                    } else if (status === 'working') {
+                        lightYellow.classList.add('yellow', 'blink');
+                        workButton.disabled = true;
+                    } else if (status === 'done') {
+                        lightGreen.classList.add('green', 'glow');
+                        workButton.disabled = true;
+                        workButton.innerHTML = '<i class="fa-solid fa-check"></i> OPERAÇÃO FINALIZADA';
+                    }
+                }
+
+                function checkStatus() {
+                    if (tasksCompletedToday >= maxTasks) {
+                        taskMessage.textContent = "LIMITE DIÁRIO ALCANÇADO";
+                        updateUI('done');
+                    } else {
+                        updateUI('idle');
+                    }
+                }
+
+                if (workButton) {
+                    workButton.addEventListener('click', function() {
+                        if (tasksCompletedToday < maxTasks) {
+                            updateUI('working');
+                            taskMessage.textContent = "SINCRONIZANDO...";
+                            progressContainer.style.display = 'block';
+                            
+                            let width = 0;
+                            let interval = setInterval(() => {
+                                if(width >= 100) clearInterval(interval);
+                                else {
+                                    width += 2;
+                                    progressFill.style.width = width + '%';
+                                }
+                            }, 50);
+
+                            fetch("{% url 'process_task' %}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': '{{ csrf_token }}'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                setTimeout(() => {
+                                    if (data.success) {
+                                        tasksCompletedToday++;
+                                        taskMessage.innerHTML = `<span style="color: #00ff88">LUCRO: KZ ${data.daily_gain}</span>`;
+                                    } else {
+                                        taskMessage.textContent = data.message || "ERRO";
+                                    }
+                                    progressContainer.style.display = 'none';
+                                    progressFill.style.width = '0%';
+                                    checkStatus();
+                                }, 2500);
+                            })
+                            .catch(error => {
+                                taskMessage.textContent = "CONEXÃO INTERROMPIDA";
+                                updateUI('idle');
+                            });
+                        }
+                    });
+                }
+                checkStatus();
+            });
+        </script>
+    {% endif %}
+</div>
+
+<style>
+    :root {
+        --bg-dark: #0a0f18;
+        --card-dark: #121926;
+        --accent-green: #00ff88;
+        --accent-yellow: #ffcc00;
+        --accent-red: #ff4d4d;
+        --text-main: #ffffff;
+        --text-dim: #8492a6;
+    }
+
+    body {
+        background-color: var(--bg-dark);
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 0;
+        color: var(--text-main);
+        overflow-x: hidden; /* Previne rolagem horizontal */
+    }
+
+    .forex-terminal {
+        width: 100%;
+        max-width: 480px; /* Limite para não esticar em tablets */
+        margin: 0 auto;
+        padding: 10px; /* Reduzido para ganhar espaço lateral */
+        box-sizing: border-box;
+    }
+
+    /* HEADER */
+    .terminal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--card-dark);
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #1e293b;
+        margin-bottom: 12px;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+    }
+
+    .live-dot {
+        width: 7px;
+        height: 7px;
+        background: var(--accent-red);
+        border-radius: 50%;
+        animation: pulse-red 1.5s infinite;
+    }
+
+    .market-info .pair { font-size: 11px; font-weight: bold; color: var(--text-dim); }
+    .market-info .price { font-family: 'JetBrains Mono', monospace; color: var(--accent-green); font-size: 12px; }
+
+    /* GRAFICO */
+    .analysis-section {
+        background: var(--card-dark);
+        border-radius: 12px;
+        padding: 5px;
+        margin-bottom: 12px;
+        border: 1px solid #1e293b;
+    }
+
+    /* CARD DE MINERAÇÃO */
+    .mining-card {
+        background: var(--card-dark);
+        border-radius: 15px;
+        padding: 15px;
+        border: 1px solid #1e293b;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .mining-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+    .stat-item .label { font-size: 8px; color: var(--text-dim); }
+    .stat-item .value { font-size: 11px; font-weight: bold; }
+
+    .display-screen {
+        background: #05070a;
+        border-radius: 8px;
+        padding: 25px 10px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #1e293b;
+        margin-bottom: 15px;
+    }
+
+    .scan-line {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 2px;
+        background: rgba(0, 255, 136, 0.2);
+        animation: scan 3s infinite linear;
+    }
+
+    #task-message {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        color: var(--text-main);
+    }
+
+    .progress-container {
+        width: 100%;
+        height: 4px;
+        background: #1a2637;
+        margin-top: 12px;
+        border-radius: 2px;
+    }
+    .progress-fill {
+        height: 100%;
+        background: var(--accent-green);
+        box-shadow: 0 0 10px var(--accent-green);
+    }
+
+    .status-lights {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 15px;
+        justify-content: center;
+    }
+
+    .light {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #232d3d;
+    }
+
+    .light.red { background: var(--accent-red); box-shadow: 0 0 10px var(--accent-red); }
+    .light.yellow { background: var(--accent-yellow); box-shadow: 0 0 10px var(--accent-yellow); }
+    .light.green { background: var(--accent-green); box-shadow: 0 0 10px var(--accent-green); }
+
+    .mining-btn {
+        width: 100%;
+        padding: 16px;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(135deg, #00ff88 0%, #00bd65 100%);
+        color: #000;
+        font-weight: 800;
+        font-size: 15px;
+        cursor: pointer;
+    }
+
+    /* ESTADO BLOQUEADO */
+    .lock-card {
+        background: var(--card-dark);
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        border: 1px dashed #334155;
+    }
+
+    @keyframes pulse-red { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+    @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+</style>
+{% endblock %}

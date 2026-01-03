@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}IBKR - Gestão Financeira{% endblock %}
+
+{% block content %}
+<div class="renda-dashboard">
+    
+    {# Header com Botão Voltar #}
+    <div class="top-bar">
+        <a href="{% url 'home' %}" class="back-btn">
+            <i class="fas fa-chevron-left"></i> Voltar
+        </a>
+        <h1 class="page-title">VISÃO GERAL</h1>
+    </div>
+
+    {# Container de Gestão #}
+    <div class="income-stats-wrapper">
+        
+        <h3 class="section-tag">ESTATUTO DA CONTA</h3>
+        <div class="stats-grid">
+            <div class="mini-card">
+                <i class="fas fa-crown icon-gold"></i>
+                <span class="label">NÍVEL</span>
+                <span class="value">{{ active_level.level.name|default:"1" }}</span>
+            </div>
+            <div class="mini-card">
+                <i class="fas fa-arrow-down icon-green"></i>
+                <span class="label">DEPÓSITO</span>
+                <span class="value">KZ {{ approved_deposit_total|default:"0" }}</span>
+            </div>
+            <div class="mini-card active-balance">
+                <i class="fas fa-wallet icon-blue"></i>
+                <span class="label">SALDO</span>
+                <span class="value">KZ {{ user.available_balance|default:"0.00" }}</span>
+            </div>
+        </div>
+
+        <h3 class="section-tag">DETALHES DE RENDIMENTOS</h3>
+        <div class="stats-grid">
+            <div class="mini-card">
+                <i class="fas fa-hand-holding-usd icon-cyan"></i>
+                <span class="label">SUBSÍDIO</span>
+                <span class="value">KZ {{ user.subsidy_balance|default:"0.00" }}</span>
+            </div>
+            <div class="mini-card">
+                <i class="fas fa-chart-line icon-green"></i>
+                <span class="label">HOJE</span>
+                <span class="value">KZ {{ daily_income|default:"0.00" }}</span>
+            </div>
+            <div class="mini-card">
+                <i class="fas fa-coins icon-purple"></i>
+                <span class="label">TOTAL</span>
+                <span class="value">KZ {{ total_income|default:"0.00" }}</span>
+            </div>
+        </div>
+
+    </div>
+
+    {# Gráfico de Mineração Simulado #}
+    <div class="mining-visual">
+        <h3 class="section-tag">MINERAÇÃO LIVE</h3>
+        <div class="chart-container">
+            <canvas id="miningChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    :root {
+        --bg-dark: #040911; /* Azul ultra escuro */
+        --card-dark: #0a1424; /* Azul marinho brilhante */
+        --accent-blue: #00d2ff;
+        --accent-green: #39ff14;
+        --text-gray: #a0aec0;
+    }
+
+    body {
+        background: radial-gradient(circle at top, #0d1b33 0%, #040911 100%) !important;
+        color: white !important;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        margin: 0;
+        overflow-x: hidden;
+    }
+
+    .renda-dashboard {
+        padding: 10px; /* Reduzido para tirar o espaçamento lateral */
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    /* BARRA SUPERIOR */
+    .top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 10px;
+    }
+
+    .back-btn {
+        text-decoration: none;
+        color: var(--accent-blue);
+        font-size: 14px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+    }
+
+    .page-title {
+        font-size: 15px;
+        letter-spacing: 2px;
+        color: white;
+        margin: 0;
+        font-weight: 900;
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+
+    /* TITULOS DE SESSÃO */
+    .section-tag {
+        font-size: 10px;
+        color: var(--accent-blue);
+        letter-spacing: 1.5px;
+        margin: 15px 0 10px 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    /* GRID SEM ESPAÇAMENTO LATERAL */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px; /* Espaço entre cards */
+        padding: 0 5px;
+    }
+
+    .mini-card {
+        background: var(--card-dark);
+        border: 1px solid rgba(0, 210, 255, 0.1);
+        border-radius: 12px;
+        padding: 15px 2px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Card de Saldo com Glow */
+    .active-balance {
+        border: 1px solid var(--accent-blue);
+        background: linear-gradient(145deg, #0a1424 0%, #0d2547 100%);
+        box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+    }
+
+    .mini-card i {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    .label {
+        font-size: 8.5px;
+        color: var(--text-gray);
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
+
+    .value {
+        font-size: 10px;
+        font-weight: 900;
+        color: #fff;
+    }
+
+    /* GRÁFICO */
+    .mining-visual {
+        margin-top: 20px;
+        padding: 0 10px;
+    }
+
+    .chart-container {
+        background: var(--card-dark);
+        border-radius: 15px;
+        padding: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        height: 150px;
+    }
+
+    /* CORES DOS ICONES */
+    .icon-gold { color: #feca57; text-shadow: 0 0 10px rgba(254, 202, 87, 0.5); }
+    .icon-green { color: var(--accent-green); text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
+    .icon-blue { color: var(--accent-blue); text-shadow: 0 0 10px rgba(0, 210, 255, 0.5); }
+    .icon-cyan { color: #00d2d3; }
+    .icon-purple { color: #a55eea; }
+
+</style>
+
+{# Script para o Gráfico Dinâmico #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('miningChart').getContext('2d');
+    let dataPoints = [10, 25, 15, 30, 20, 45, 35, 55, 40, 60];
+    
+    const miningChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['', '', '', '', '', '', '', '', '', ''],
+            datasets: [{
+                label: 'Minerando...',
+                data: dataPoints,
+                borderColor: '#00d2ff',
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: true,
+                backgroundColor: 'rgba(0, 210, 255, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { display: false },
+                x: { display: false }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // Simulação de movimento do gráfico
+    setInterval(() => {
+        dataPoints.shift();
+        dataPoints.push(Math.floor(Math.random() * 50) + 10);
+        miningChart.update();
+    }, 1500);
+</script>
+{% endblock %}
