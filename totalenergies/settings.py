@@ -1,6 +1,6 @@
 """
 Django settings for totalenergies project.
-Configurado para Testagem Local e Produção.
+Configurado para Testagem Local e Produção no Render.com.
 """
 
 from pathlib import Path
@@ -11,25 +11,25 @@ from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SEGURANÇA: DEBUG True para testagem local, False para hospedagem
-# No seu arquivo .env, defina DEBUG=True
-DEBUG = config('DEBUG', default=True, cast=bool)
+# SEGURANÇA: DEBUG True localmente, False no Render
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-local-key-123')
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-mudar-isso-em-producao')
 
 # ======================================================================
-# CONFIGURAÇÃO DOS HOSTS PERMITIDOS
+# CONFIGURAÇÃO DOS HOSTS PERMITIDOS E CSRF
 # ======================================================================
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-hosts_string = config('ALLOWED_HOSTS', default='')
-if hosts_string:
-    ALLOWED_HOSTS.extend([host.strip() for host in hosts_string.split(',')])
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost']
 
-if not DEBUG:
-    RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-    if RENDER_EXTERNAL_HOSTNAME:
-        if RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
-            ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+# Adiciona o domínio do Render dinamicamente
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    ALLOWED_HOSTS.append(f"{RENDER_EXTERNAL_HOSTNAME}.onrender.com")
+    # Importante para o Django 4.x+ não bloquear formulários
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}.onrender.com")
 
 # Application definition
 INSTALLED_APPS = [
@@ -78,11 +78,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'totalenergies.wsgi.application'
 
 # ======================================================================
-# DATABASE (SQLite para Local, URL para Produção)
+# DATABASE (SQLite Local, PostgreSQL no Render via env DATABASE_URL)
 # ======================================================================
 DATABASES = {
     'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR}/db.sqlite3',
+        default=config('DATABASE_URL', default=f'sqlite:///{BASE_DIR}/db.sqlite3'),
         conn_max_age=600
     )
 }
@@ -94,16 +94,14 @@ USE_I18N = True
 USE_TZ = True
 
 # ======================================================================
-# STATIC FILES (CSS, JS)
+# STATIC FILES (CSS, JS, Imagens)
 # ======================================================================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# Localmente usamos o padrão, em produção usamos o WhiteNoise comprimido
-if DEBUG:
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-else:
+# Configuração do WhiteNoise para produção
+if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ======================================================================
@@ -112,31 +110,18 @@ else:
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-if not os.path.exists(MEDIA_ROOT):
-    os.makedirs(MEDIA_ROOT)
-
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-
 # ======================================================================
-# SEGURANÇA (Desativado em DEBUG para permitir cadastro local)
+# CONFIGURAÇÕES GERAIS
 # ======================================================================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core.CustomUser'
 LOGIN_URL = 'login'
 
 if not DEBUG:
-    # Estas configs só ativam se DEBUG for False (Produção)
+    # Segurança rigorosa em produção
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-else:
-    # Configurações para facilitar o desenvolvimento local
-    CSRF_COOKIE_SECURE = False
-    SESSION_COOKIE_SECURE = False
     
