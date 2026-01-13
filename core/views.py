@@ -48,7 +48,7 @@ def menu(request):
     }
     return render(request, 'menu.html', context)
 
-# --- CADASTRO (REMOVIDO 1000 KZ) ---
+# --- CADASTRO ---
 def cadastro(request):
     invite_code_from_url = request.GET.get('invite', None)
     if request.method == 'POST':
@@ -56,8 +56,6 @@ def cadastro(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
-            
-            # SALDO INICIAL DEFINIDO COMO 0 CONFORME PEDIDO
             user.available_balance = 0 
             
             invited_by_code = form.cleaned_data.get('invited_by_code')
@@ -202,12 +200,15 @@ def saque(request):
 def tarefa(request):
     user = request.user
     active_level = UserLevel.objects.filter(user=user, is_active=True).first()
-    has_active_level = active_level is not None
-    today = date.today()
+    
+    # Se não tem VIP, ele é "Estagiário"
+    is_estagiario = active_level is None
+    
+    today = timezone.localdate()
     tasks_completed_today = Task.objects.filter(user=user, completed_at__date=today).count()
     
     context = {
-        'has_active_level': has_active_level,
+        'is_estagiario': is_estagiario,
         'active_level': active_level,
         'tasks_completed_today': tasks_completed_today,
         'max_tasks': 1,
@@ -218,64 +219,53 @@ def tarefa(request):
 @require_POST
 def process_task(request):
     user = request.user
-    
+    today = timezone.localdate()
+
+    if Task.objects.filter(user=user, completed_at__date=today).exists():
+        return JsonResponse({'success': False, 'message': 'Limite diário de tarefas alcançado.'})
+
     try:
-        # 1. Busca o vínculo de nível ativo
         active_user_level = UserLevel.objects.filter(user=user, is_active=True).select_related('level').first()
 
-        if not active_user_level:
-            return JsonResponse({'success': False, 'message': 'Você não possui um nível VIP ativo.'})
+        if active_user_level:
+            task_earnings = Decimal(str(active_user_level.level.daily_gain))
+        else:
+            task_earnings = Decimal('80.00')
 
-        # 2. Verifica se a tarefa já foi feita hoje (evita duplicidade)
-        today = timezone.localdate()
-        if Task.objects.filter(user=user, completed_at__date=today).exists():
-            return JsonResponse({'success': False, 'message': 'Limite diário de tarefas alcançado.'})
-
-        # 3. Pega o valor do ganho (USANDO O NOME CORRETO DO SEU MODELS: daily_gain)
-        task_earnings = Decimal(str(active_user_level.level.daily_gain))
-
-        # 4. Registra a tarefa no banco (Para aparecer no Admin)
-        Task.objects.create(
-            user=user, 
-            earnings=task_earnings
-            # completed_at é auto_now_add, então não precisa passar manualmente
-        ) 
-        
-        # 5. Adiciona o valor ao saldo do usuário que realizou a tarefa
+        Task.objects.create(user=user, earnings=task_earnings) 
         user.available_balance += task_earnings
         user.save()
 
-        # 6. Distribuição de Subsídios para a Rede (A, B, C)
-        # Nível A (100 KZ)
         p1 = user.invited_by
         if p1:
-            p1.available_balance += Decimal('100.00')
-            p1.subsidy_balance += Decimal('100.00')
+            subsidy_a = task_earnings * Decimal('0.20')
+            p1.available_balance += subsidy_a
+            p1.subsidy_balance += subsidy_a
             p1.save()
 
-            # Nível B (30 KZ)
             p2 = p1.invited_by
             if p2:
-                p2.available_balance += Decimal('30.00')
-                p2.subsidy_balance += Decimal('30.00')
+                subsidy_b = task_earnings * Decimal('0.03')
+                p2.available_balance += subsidy_b
+                p2.subsidy_balance += subsidy_b
                 p2.save()
 
-                # Nível C (10 KZ)
                 p3 = p2.invited_by
                 if p3:
-                    p3.available_balance += Decimal('10.00')
-                    p3.subsidy_balance += Decimal('10.00')
+                    subsidy_c = task_earnings * Decimal('0.02')
+                    p3.available_balance += subsidy_c
+                    p3.subsidy_balance += subsidy_c
                     p3.save()
 
         return JsonResponse({
             'success': True, 
-            'message': f'Tarefa concluída! {task_earnings} KZ foram adicionados ao seu saldo.'
+            'message': f'Tarefa concluída! {task_earnings} KZ adicionados ao saldo.'
         })
 
     except Exception as e:
-        # Se der qualquer erro, o JSON evita a "Conexão Interrompida" e mostra o erro real
         return JsonResponse({'success': False, 'message': f'Erro: {str(e)}'})
 
+# --- NÍVEL (CORREÇÃO AQUI) ---
 @login_required
 def nivel(request):
     if request.method == 'POST':
@@ -294,7 +284,6 @@ def nivel(request):
             request.user.level_active = True
             request.user.save()
 
-            # Nível A (15%)
             p1 = request.user.invited_by
             if p1 and UserLevel.objects.filter(user=p1, is_active=True).exists():
                 com1 = val * Decimal('0.15')
@@ -302,7 +291,6 @@ def nivel(request):
                 p1.subsidy_balance += com1
                 p1.save()
 
-                # Nível B (3%)
                 p2 = p1.invited_by
                 if p2 and UserLevel.objects.filter(user=p2, is_active=True).exists():
                     com2 = val * Decimal('0.03')
@@ -310,7 +298,6 @@ def nivel(request):
                     p2.subsidy_balance += com2
                     p2.save()
 
-                    # Nível C (1%)
                     p3 = p2.invited_by
                     if p3 and UserLevel.objects.filter(user=p3, is_active=True).exists():
                         com3 = val * Decimal('0.01')
@@ -329,10 +316,11 @@ def nivel(request):
     }
     return render(request, 'nivel.html', context)
 
-# --- EQUIPA ---
+# --- EQUIPA (ATUALIZADO PARA LISTAGEM) ---
 @login_required
 def equipa(request):
     user = request.user
+    # Busca os usuários de cada nível
     level_a = CustomUser.objects.filter(invited_by=user)
     level_b = CustomUser.objects.filter(invited_by__in=level_a)
     level_c = CustomUser.objects.filter(invited_by__in=level_b)
@@ -350,6 +338,10 @@ def equipa(request):
         'level_b_investors': level_b.filter(userlevel__is_active=True).distinct().count(),
         'level_c_count': level_c.count(),
         'level_c_investors': level_c.filter(userlevel__is_active=True).distinct().count(),
+        # LISTAS ADICIONADAS ABAIXO PARA O HTML CONSEGUIR LISTAR OS NOMES/NÚMEROS
+        'level_a': level_a,
+        'level_b': level_b,
+        'level_c': level_c,
     }
     return render(request, 'equipa.html', context)
 
@@ -397,24 +389,28 @@ def sobre(request):
 
 @login_required
 def perfil(request):
-    bank_details, _ = BankDetails.objects.get_or_create(user=request.user)
+    bank_details, created = BankDetails.objects.get_or_create(user=request.user)
     withdrawal_records = Withdrawal.objects.filter(user=request.user).order_by('-created_at')
+    
     if request.method == 'POST':
         if 'update_bank' in request.POST:
             form = BankDetailsForm(request.POST, instance=bank_details)
             if form.is_valid():
                 form.save()
-                messages.success(request, 'Banco atualizado.')
+                messages.success(request, 'Dados bancários atualizados com sucesso!')
+                return redirect('perfil')
+        
         elif 'change_password' in request.POST:
             password_form = PasswordChangeForm(request.user, request.POST)
             if password_form.is_valid():
                 user = password_form.save()
                 update_session_auth_hash(request, user)
-                messages.success(request, 'Senha alterada.')
-        return redirect('perfil')
-    
+                messages.success(request, 'Senha alterada com sucesso!')
+                return redirect('perfil')
+
     context = {
         'form': BankDetailsForm(instance=bank_details),
+        'bank_info': bank_details,
         'password_form': PasswordChangeForm(request.user),
         'user_levels': UserLevel.objects.filter(user=request.user, is_active=True),
         'withdrawal_records': withdrawal_records,

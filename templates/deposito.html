@@ -1,39 +1,39 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Depósito{% endblock %}
+{% block title %}Depósito - TotalEnergies{% endblock %}
 
 {% block content %}
 <div class="deposit-container">
     <div class="jackpay-header">
         <div class="logo-box">
-            <span class="logo-icon">💠</span> JackPay
+            <i class="fas fa-shield-alt"></i> <span>JackPay Security</span>
         </div>
     </div>
 
     <div class="stepper">
         <div class="step-item" id="step-dot-1">
             <div class="circle active">1</div>
-            <span>Escolher</span>
+            <span>Valor</span>
         </div>
         <div class="line"></div>
         <div class="step-item" id="step-dot-2">
-            <div class="circle">2</div>
-            <span>Pagar</span>
+            <div class="circle" id="circle-2">2</div>
+            <span>Banco</span>
         </div>
         <div class="line"></div>
         <div class="step-item" id="step-dot-3">
-            <div class="circle">3</div>
-            <span>Comprovativo</span>
+            <div class="circle" id="circle-3">3</div>
+            <span>Envio</span>
         </div>
     </div>
 
     {% if deposit_success %}
         <div class="success-screen">
-            <div class="success-icon">✓</div>
-            <h2>Depósito Enviado com Sucesso!</h2>
-            <p>O seu depósito está a ser processado e será confirmado em 5 a 30 minutos.</p>
-            <a href="{% url 'menu' %}" class="btn-main">Voltar ao Menu</a>
+            <div class="success-icon"><i class="fas fa-check"></i></div>
+            <h2>Solicitação Enviada!</h2>
+            <p>O seu depósito será confirmado em nossa conta em um período de 5 a 30 minutos.</p>
+            <a href="{% url 'home' %}" class="btn-main">Voltar ao Início</a>
         </div>
     {% else %}
         <form id="deposit-form" method="post" enctype="multipart/form-data">
@@ -43,18 +43,18 @@
 
             <div id="step-1" class="step-content">
                 <div class="balance-card">
-                    <p>Saldo</p>
+                    <p><i class="fas fa-wallet"></i> Saldo Disponível</p>
                     <h3>Kz 0.00</h3>
                 </div>
 
                 <div class="amount-section">
-                    <label>Valor do Recarregamento</label>
+                    <label>Valor do Depósito</label>
                     <div class="input-wrapper">
-                        <span>Kz</span>
-                        <input type="number" id="manual-amount" placeholder="Valor do Recarregamento">
+                        <span class="currency-tag">Kz</span>
+                        <input type="number" id="manual-amount" placeholder="0.00" min="3000">
                     </div>
 
-                    <p class="label-small">Valores Rápidos</p>
+                    <p class="label-small">Sugestões de Investimento</p>
                     <div class="grid-amounts">
                         {% for deposit_value in level_deposits_list %}
                             <button type="button" class="amount-btn" data-value="{{ deposit_value }}">{{ deposit_value }}</button>
@@ -63,27 +63,28 @@
                 </div>
 
                 <div class="info-rules">
-                    <h4>Informações Importantes</h4>
+                    <h4><i class="fas fa-info-circle"></i> Regras de Depósito</h4>
                     <ul>
-                        <li><span>1</span> Não Deposite valores em bancos diferentes.</li>
-                        <li><span>2</span> Não falsifique os comprovativos, para evitar banir a sua conta.</li>
-                        <li><span>3</span> Horário de depósito: <strong>08:30 até 20:00</strong>.</li>
-                        <li><span>4</span> Dias de Depósito: <strong>Segunda a Domingo</strong>.</li>
+                        <li><span class="dot">1</span> Use apenas o IBAN indicado no passo seguinte.</li>
+                        <li><span class="dot">2</span> O comprovativo deve estar legível (Foto ou PDF).</li>
+                        <li><span class="dot">3</span> Horário de atendimento: <strong>08:30 às 21:00</strong>.</li>
+                        <li><span class="dot">4</span> Valor mínimo para recarga: <strong>10.000 Kz</strong>.</li>
                     </ul>
                 </div>
                 
-                <button type="button" class="btn-main" id="to-step-2" disabled>Recarregar Agora</button>
+                <button type="button" class="btn-main" id="to-step-2" disabled>Continuar</button>
             </div>
 
             <div id="step-2" class="step-content" style="display: none;">
+                <h4 class="step-title">Selecione o seu Banco</h4>
                 <div class="bank-list">
                     {% for bank in platform_bank_details %}
                         <button type="button" class="bank-option-btn" data-bank-id="{{ forloop.counter }}">
-                            {{ bank.bank_name }}
+                            <i class="fas fa-university"></i> {{ bank.bank_name }}
                         </button>
                     {% endfor %}
                 </div>
-                <button type="button" class="btn-main" id="to-step-3" style="margin-top:20px" disabled>Próxima etapa</button>
+                <button type="button" class="btn-main" id="to-step-3" style="margin-top:20px" disabled>Ver Dados Bancários</button>
             </div>
 
             <div id="step-3" class="step-content" style="display: none;">
@@ -91,52 +92,52 @@
                     {% for bank in platform_bank_details %}
                         <div id="details-{{ forloop.counter }}" class="bank-info-card" style="display: none;">
                             <div class="info-group">
-                                <label>Método de Pagamento</label>
+                                <label>Banco de Destino</label>
                                 <div class="copy-input">
                                     <input type="text" value="{{ bank.bank_name }}" readonly>
-                                    <button type="button" class="copy-icon">📋</button>
                                 </div>
                             </div>
                             <div class="info-group">
-                                <label>Nome de Usuário</label>
+                                <label>Titular da Conta</label>
                                 <div class="copy-input">
                                     <input type="text" value="{{ bank.account_holder_name }}" readonly>
-                                    <button type="button" class="copy-icon">📋</button>
+                                    <button type="button" class="copy-btn" onclick="copyValue('{{ bank.account_holder_name }}')"><i class="far fa-copy"></i></button>
                                 </div>
                             </div>
                             <div class="info-group">
-                                <label>Número da Conta (IBAN)</label>
+                                <label>IBAN (Copie abaixo)</label>
                                 <div class="copy-input">
                                     <input type="text" value="{{ bank.IBAN }}" id="iban-{{ forloop.counter }}" readonly>
-                                    <button type="button" class="copy-icon" onclick="copyText('iban-{{ forloop.counter }}')">📋</button>
+                                    <button type="button" class="copy-btn" onclick="copyText('iban-{{ forloop.counter }}')"><i class="far fa-copy"></i></button>
                                 </div>
                             </div>
                             <div class="info-group">
-                                <label>Valor do Pagamento</label>
-                                <div class="copy-input">
-                                    <input type="text" class="display-final-amount" readonly>
-                                    <button type="button" class="copy-icon">📋</button>
+                                <label>Valor a Transferir</label>
+                                <div class="copy-input highlight">
+                                    <input type="text" class="display-final-amount" readonly style="font-weight: bold; color: #2e7d32;">
                                 </div>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
-                <button type="button" class="btn-main" id="to-step-4">Já fiz o pagamento</button>
+                <button type="button" class="btn-main" id="to-step-4">Já fiz a transferência</button>
             </div>
 
             <div id="step-4" class="step-content" style="display: none;">
-                <p class="upload-label">comprovante de pagamento</p>
+                <p class="upload-label">Anexe o comprovativo oficial abaixo</p>
                 <div class="upload-box" onclick="document.getElementById('file-upload').click()">
-                    <div class="upload-icon">☁️</div>
+                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
                     <input type="file" name="{{ form.proof_of_payment.name }}" id="file-upload" hidden accept="image/*">
-                    <p id="file-name" style="font-size: 12px; color: #888;"></p>
+                    <p id="file-name" style="font-size: 13px; color: #2d3436; font-weight: 600;"></p>
+                    <p style="font-size: 11px; color: #999;">Clique para selecionar arquivo</p>
                 </div>
                 
                 <div class="info-group" style="margin-top: 20px;">
-                    <input type="text" name="payer_name" placeholder="Nome do pagador" class="simple-input" required>
+                    <label>Nome do Depositante</label>
+                    <input type="text" name="payer_name" placeholder="Ex: João Silva" class="simple-input" required>
                 </div>
 
-                <button type="submit" class="btn-main btn-submit" style="background-color: #1abc9c;">Enviar</button>
+                <button type="submit" class="btn-main btn-submit" style="background: #2e7d32;">Finalizar Depósito</button>
             </div>
         </form>
     {% endif %}
@@ -144,201 +145,207 @@
 
 <style>
     :root {
-        --primary-blue: #4e73df;
-        --secondary-teal: #1abc9c;
-        --bg-light: #f8f9fc;
-        --text-dark: #333;
+        --total-blue: #0056b3;
+        --total-green: #2e7d32;
+        --bg-white: #ffffff;
+        --text-dark: #2d3436;
+        --border-color: #dfe6e9;
     }
 
-    body { background-color: #eee; font-family: sans-serif; margin: 0; }
+    /* Reset para ecrãs menores */
+    html, body { 
+        max-width: 100%; 
+        overflow-x: hidden; 
+        background-color: var(--bg-white) !important; 
+        margin: 0; 
+        padding: 0;
+        font-family: 'Poppins', sans-serif;
+    }
 
     .deposit-container {
-        max-width: 450px;
+        width: 100%;
+        max-width: 500px;
         margin: 0 auto;
-        background: white;
+        background: var(--bg-white);
         min-height: 100vh;
-        padding: 20px;
+        padding: 15px;
+        box-sizing: border-box;
     }
 
-    /* Header Estilo JackPay */
-    .jackpay-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
+    /* Header */
+    .jackpay-header { text-align: center; margin-bottom: 25px; padding-top: 10px; }
     .logo-box {
-        background: linear-gradient(to right, #b8c6ff, #f5f7ff);
-        padding: 10px 40px;
-        display: inline-block;
-        border-radius: 4px;
-        font-weight: bold;
-        color: #2c3e50;
-        font-size: 24px;
+        background: #f1f2f6;
+        padding: 8px 25px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border-radius: 50px;
+        font-weight: 800;
+        color: var(--total-blue);
+        border: 1px solid #dcdde1;
     }
 
-    /* Stepper */
+    /* Stepper Estável */
     .stepper {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 40px;
-        padding: 0 10px;
+        margin-bottom: 30px;
+        padding: 0 5px;
     }
-    .step-item { text-align: center; font-size: 12px; color: #3498db; }
-    .step-item .circle {
-        width: 35px; height: 35px;
+    .step-item { text-align: center; flex: 1; }
+    .step-item span { font-size: 10px; font-weight: 600; color: #b2bec3; text-transform: uppercase; display: block; margin-top: 5px; }
+    .circle {
+        width: 32px; height: 32px;
         border-radius: 50%;
-        border: 2px solid #57cc99;
+        border: 2px solid #dfe6e9;
         display: flex; align-items: center; justify-content: center;
-        margin: 0 auto 5px;
-        background: white; color: #57cc99;
-        font-weight: bold;
+        margin: 0 auto;
+        background: white; color: #b2bec3;
+        font-weight: bold; font-size: 14px;
+        transition: 0.3s;
     }
-    .step-item .circle.active { background: #57cc99; color: white; }
-    .step-item .circle.checked { background: #57cc99; color: white; font-size: 18px; }
-    .line { flex: 1; height: 2px; background: #57cc99; margin-bottom: 25px; }
+    .circle.active { border-color: var(--total-blue); color: var(--total-blue); background: #eef2ff; }
+    .circle.checked { background: var(--total-blue); color: white; border-color: var(--total-blue); }
+    .line { flex: 0.5; height: 2px; background: #dfe6e9; margin-top: -15px; }
 
-    /* Imagem 1: Cards de Saldo e Valores */
+    /* Cards */
     .balance-card {
-        background: var(--primary-blue);
-        color: white;
-        padding: 20px;
-        border-radius: 10px 10px 0 0;
-        margin-bottom: -10px;
+        background: linear-gradient(135deg, var(--total-blue), #003d82);
+        color: white; padding: 20px; border-radius: 15px; margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(0,86,179,0.2);
     }
-    .amount-section {
-        background: white;
-        border-radius: 15px;
-        padding: 20px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
+    .balance-card h3 { margin: 5px 0 0; font-size: 24px; }
+    .balance-card p { margin: 0; font-size: 12px; opacity: 0.9; }
+
+    .amount-section { background: #fff; border: 1px solid var(--border-color); border-radius: 15px; padding: 15px; }
     .input-wrapper {
-        display: flex; border: 1px solid #ddd;
-        border-radius: 8px; padding: 10px; margin: 10px 0;
+        display: flex; align-items: center; background: #f8f9fa;
+        border: 2px solid #eee; border-radius: 10px; padding: 10px; margin: 10px 0;
     }
-    .input-wrapper input { border: none; outline: none; width: 100%; margin-left: 10px; font-size: 16px; }
+    .currency-tag { font-weight: bold; color: var(--total-blue); border-right: 1px solid #ddd; padding-right: 10px; }
+    .input-wrapper input { border: none; background: transparent; outline: none; width: 100%; padding-left: 10px; font-size: 18px; font-weight: 600; }
 
-    .grid-amounts {
-        display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 15px 0;
-    }
+    .grid-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
     .amount-btn {
-        border: 1px solid #ddd; background: white;
-        padding: 10px 5px; border-radius: 50%;
-        font-size: 11px; cursor: pointer; aspect-ratio: 1;
+        border: 1px solid #eee; background: #fff;
+        padding: 12px 5px; border-radius: 8px;
+        font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s;
     }
-    .amount-btn.active { border-color: var(--primary-blue); color: var(--primary-blue); }
+    .amount-btn.active { background: var(--total-blue); color: white; border-color: var(--total-blue); }
 
-    /* Regras */
-    .info-rules { margin-top: 20px; font-size: 13px; color: #555; background: #fff9f9; padding: 15px; border-radius: 8px; }
-    .info-rules h4 { margin-top: 0; color: #c0392b; }
-    .info-rules ul { list-style: none; padding: 0; }
-    .info-rules li { margin-bottom: 8px; display: flex; align-items: flex-start; }
-    .info-rules li span { 
-        background: #c0392b; color: white; width: 18px; height: 18px; 
-        border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        font-size: 10px; margin-right: 8px; flex-shrink: 0; margin-top: 2px;
-    }
+    /* Info */
+    .info-rules { margin-top: 20px; background: #fff5f5; padding: 15px; border-radius: 12px; border-left: 4px solid #eb4d4b; }
+    .info-rules h4 { margin: 0 0 10px; color: #eb4d4b; font-size: 14px; }
+    .info-rules ul { list-style: none; padding: 0; margin: 0; }
+    .info-rules li { font-size: 12px; margin-bottom: 8px; color: #444; display: flex; align-items: center; }
+    .dot { width: 18px; height: 18px; background: #eb4d4b; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; margin-right: 10px; flex-shrink: 0; }
 
-    /* Imagem 2: Bancos */
+    /* Bancos */
     .bank-option-btn {
-        width: 100%; padding: 15px; margin-bottom: 10px;
-        background: white; border: 1px solid #eee;
-        text-align: center; border-radius: 5px; cursor: pointer;
-        font-weight: 500; transition: 0.2s;
+        width: 100%; padding: 16px; margin-bottom: 10px;
+        background: #fff; border: 1px solid #eee;
+        display: flex; align-items: center; gap: 15px;
+        border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s;
     }
-    .bank-option-btn.active { border: 2px solid var(--primary-blue); background: #f0f4ff; }
+    .bank-option-btn i { color: var(--total-blue); }
+    .bank-option-btn.active { border: 2px solid var(--total-blue); background: #f0f7ff; color: var(--total-blue); }
 
-    /* Imagem 3: Detalhes */
-    .info-group { margin-bottom: 15px; }
-    .info-group label { display: block; font-size: 13px; color: #666; margin-bottom: 5px; }
+    /* Detalhes de Cópia */
     .copy-input {
-        display: flex; align-items: center; background: #fff;
-        border: 1px solid #ddd; border-radius: 6px; overflow: hidden;
+        display: flex; align-items: center; background: #f8f9fa;
+        border: 1px solid #ddd; border-radius: 8px; margin-top: 5px;
     }
-    .copy-input input { border: none; padding: 12px; flex: 1; outline: none; font-size: 14px; background: transparent; }
-    .copy-icon { background: #81ecec; border: none; padding: 12px; cursor: pointer; }
+    .copy-input input { border: none; padding: 12px; flex: 1; outline: none; font-size: 13px; background: transparent; font-weight: 500; }
+    .copy-btn { background: #dfe6e9; border: none; padding: 12px 15px; cursor: pointer; color: var(--total-blue); }
+    .highlight { border: 1px solid #2e7d32; background: #e8f5e9; }
 
-    /* Imagem 4: Upload */
-    .upload-label { text-align: center; color: #999; margin-bottom: 15px; }
+    /* Upload */
     .upload-box {
-        border: 2px dashed #ccc; border-radius: 10px;
-        padding: 40px; text-align: center; cursor: pointer;
+        border: 2px dashed #b2bec3; border-radius: 15px;
+        padding: 30px; text-align: center; cursor: pointer; background: #fdfdfd;
     }
-    .upload-icon { font-size: 40px; color: #ccc; }
+    .upload-icon { font-size: 35px; color: #b2bec3; margin-bottom: 10px; }
     .simple-input {
-        width: 100%; border: 1px solid #eee; border-radius: 8px;
-        padding: 15px; box-sizing: border-box; background: #fafafa;
+        width: 100%; border: 1px solid #eee; border-radius: 10px;
+        padding: 14px; box-sizing: border-box; background: #f8f9fa; font-size: 14px;
     }
 
     /* Botão Principal */
     .btn-main {
-        width: 100%; background: var(--primary-blue); color: white;
-        border: none; padding: 15px; border-radius: 30px;
-        font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px;
+        width: 100%; background: var(--total-blue); color: white;
+        border: none; padding: 16px; border-radius: 12px;
+        font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s;
     }
-    .btn-main:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-main:disabled { background: #dfe6e9; color: #b2bec3; cursor: not-allowed; }
 
-    /* Sucesso */
-    .success-screen { text-align: center; padding: 40px 20px; }
+    .success-screen { text-align: center; padding: 40px 10px; }
     .success-icon { 
-        width: 80px; height: 80px; background: #57cc99; color: white;
+        width: 70px; height: 70px; background: var(--total-green); color: white;
         border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        font-size: 40px; margin: 0 auto 20px;
+        font-size: 30px; margin: 0 auto 20px;
     }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        let currentStep = 1;
         const amountBtns = document.querySelectorAll('.amount-btn');
         const bankBtns = document.querySelectorAll('.bank-option-btn');
+        const manualInput = document.getElementById('manual-amount');
+        const amountHidden = document.getElementById('id_amount');
+        const bankHidden = document.getElementById('id_selected_bank');
+        
         const next1 = document.getElementById('to-step-2');
         const next2 = document.getElementById('to-step-3');
-        const amountInput = document.getElementById('id_amount');
-        const bankInput = document.getElementById('id_selected_bank');
 
-        // Seleção de Valor
+        // Sincronizar input manual com botões
+        manualInput.addEventListener('input', (e) => {
+            amountHidden.value = e.target.value;
+            amountBtns.forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.display-final-amount').forEach(el => el.value = e.target.value + " Kz");
+            next1.disabled = e.target.value < 3000;
+        });
+
         amountBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 amountBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                amountInput.value = btn.dataset.value;
-                document.querySelectorAll('.display-final-amount').forEach(el => el.value = btn.dataset.value + ".00");
+                manualInput.value = btn.dataset.value;
+                amountHidden.value = btn.dataset.value;
+                document.querySelectorAll('.display-final-amount').forEach(el => el.value = btn.dataset.value + " Kz");
                 next1.disabled = false;
             });
         });
 
-        // Navegação Step 1 -> 2
         next1.addEventListener('click', () => {
             goToStep(2);
-            updateStepper(2);
+            document.getElementById('circle-2').classList.add('active');
         });
 
-        // Seleção de Banco
         bankBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 bankBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                bankInput.value = btn.dataset.bankId;
+                bankHidden.value = btn.dataset.bankId;
                 next2.disabled = false;
             });
         });
 
-        // Navegação Step 2 -> 3
         next2.addEventListener('click', () => {
-            const bankId = bankInput.value;
+            const bankId = bankHidden.value;
             document.querySelectorAll('.bank-info-card').forEach(card => card.style.display = 'none');
             document.getElementById(`details-${bankId}`).style.display = 'block';
             goToStep(3);
-            updateStepper(2); // "Pagar" ainda é step 2 no visual
         });
 
-        // Navegação Step 3 -> 4
         document.getElementById('to-step-4').addEventListener('click', () => {
             goToStep(4);
-            updateStepper(3);
+            document.getElementById('circle-3').classList.add('active');
+            document.getElementById('circle-2').classList.add('checked');
+            document.getElementById('circle-2').innerHTML = "✓";
         });
 
-        // File Upload preview
         document.getElementById('file-upload').addEventListener('change', function() {
             document.getElementById('file-name').innerText = this.files[0] ? this.files[0].name : "";
         });
@@ -348,25 +355,18 @@
             document.getElementById(`step-${step}`).style.display = 'block';
             window.scrollTo(0,0);
         }
-
-        function updateStepper(activeStep) {
-            const dots = document.querySelectorAll('.step-item .circle');
-            dots.forEach((dot, idx) => {
-                if (idx + 1 < activeStep) {
-                    dot.classList.add('checked');
-                    dot.innerHTML = "✓";
-                } else if (idx + 1 === activeStep) {
-                    dot.classList.add('active');
-                }
-            });
-        }
     });
 
     function copyText(id) {
-        const copyText = document.getElementById(id);
-        copyText.select();
-        navigator.clipboard.writeText(copyText.value);
-        alert("Copiado: " + copyText.value);
+        const input = document.getElementById(id);
+        input.select();
+        navigator.clipboard.writeText(input.value);
+        alert("Copiado com sucesso!");
+    }
+
+    function copyValue(val) {
+        navigator.clipboard.writeText(val);
+        alert("Copiado: " + val);
     }
 </script>
 {% endblock %}

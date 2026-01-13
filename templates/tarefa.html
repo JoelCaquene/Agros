@@ -1,379 +1,286 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Forex Mining - Trading Terminal{% endblock %}
+{% block title %}TotalEnergies - Smart Grid Terminal{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
 
-<div class="forex-terminal">
-    {# A. HEADER PROFISSIONAL #}
-    <div class="terminal-header">
-        <div class="status-indicator">
-            <span class="live-dot"></span>
-            <span class="status-text">LIVE MARKET DATA</span>
-        </div>
-        <div class="market-info">
-            <span class="pair">EUR/USD <i class="fa-solid fa-chart-line"></i></span>
-            <span class="price" id="live-price">1.08420</span>
-        </div>
-    </div>
-
-    {% if not has_active_level %}
-    {# B. ESTADO BLOQUEADO (NÍVEL INATIVO) #}
-    <div class="locked-container">
-        <div class="lock-card">
-            <i class="fa-solid fa-shield-halved lock-icon"></i>
-            <h2>Terminal Desconectado</h2>
-            <p>Seu acesso ao mercado global está restrito. Adquira um plano de mineração para iniciar operações.</p>
-            <div class="alert-box">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                <span>STATUS: NÃO TENS AUTORIZAÇÃO, CONTACTA PRIMEIRO ADMINISTRADOR</span>
-            </div>
-        </div>
-    </div>
-    {% else %}
+<div class="energy-terminal-wrapper">
+    <div class="energy-terminal">
         
-        {# C. AREA DE ANALISE (GRAFICOS) #}
-        <div class="analysis-section">
-            <div id="chart-timeline"></div>
+        {# HEADER TOTALENERGIES #}
+        <div class="energy-header">
+            <div class="brand-section">
+                <div class="total-logo">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">TotalEnergies</span>
+                    <span class="terminal-id">SMART GRID V2.4</span>
+                </div>
+            </div>
+            <div class="system-status">
+                <span class="status-label">
+                    {% if is_estagiario %}PLANO ESTAGIÁRIO{% else %}REDE ESTÁVEL{% endif %}
+                </span>
+                <div class="status-bar">
+                    <div class="status-fill"></div>
+                </div>
+            </div>
         </div>
 
-        {# D. CONTAINER DE MINERAÇÃO (A TAREFA) #}
-        <div class="mining-card">
-            <div class="mining-stats">
-                <div class="stat-item">
-                    <span class="label">VOLATILIDADE</span>
-                    <span class="value high">ALTA</span>
-                </div>
-                <div class="stat-item">
-                    <span class="label">CONEXÃO</span>
-                    <span class="value secure">ENCRIPTADA</span>
-                </div>
+        {# REMOVIDO O BLOQUEIO: Agora permite Estagiários ou VIPs #}
+        
+        {# SELECÇÃO DE TAREFA (TABS) #}
+        <div class="task-tabs">
+            <div class="tab-item active" id="tab-buy-control">
+                <i class="fa-solid fa-solar-panel"></i>
+                <span>1. COMPRA</span>
             </div>
-
-            <div class="display-screen">
-                <div class="scan-line"></div>
-                <p id="task-message">SISTEMA PRONTO PARA MINERAÇÃO FOREX</p>
-                <div class="progress-container" id="progress-bar-container" style="display: none;">
-                    <div class="progress-fill" id="progress-fill"></div>
-                </div>
+            <div class="tab-item disabled" id="tab-sell-control">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
+                <span>2. VENDA</span>
             </div>
+        </div>
 
-            <div class="control-panel">
-                <div class="status-lights">
-                    <div class="light" id="light-red" title="Aguardando"></div>
-                    <div class="light" id="light-yellow" title="Processando"></div>
-                    <div class="light" id="light-green" title="Concluído"></div>
-                </div>
+        {# AREA PRINCIPAL #}
+        <div class="main-display">
+            
+            <div id="section-buy" class="content-section">
+                <h3 class="section-title">Componentes Disponíveis</h3>
                 
-                <button id="work-button" class="mining-btn">
-                    <i class="fa-solid fa-microchip"></i> 
-                    <span>MINERAÇÃO FOREX</span>
+                {% if is_estagiario %}
+                <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 15px; border: 1px solid #ffeeba;">
+                    <i class="fa-solid fa-circle-info"></i> Você está no <strong>Plano Gratuito</strong>. Ganho de hoje: <strong>80 KZ</strong>.
+                </div>
+                {% endif %}
+
+                <div class="energy-list">
+                    <div class="energy-item">
+                        <div class="item-icon"><i class="fa-solid fa-solar-panel"></i></div>
+                        <div class="item-info">
+                            <strong>Kit Solar Fotovoltaico</strong>
+                            <span>Eficiência: 98.5%</span>
+                        </div>
+                        <button class="buy-action-btn">Comprar</button>
+                    </div>
+                    <div class="energy-item">
+                        <div class="item-icon"><i class="fa-solid fa-wind"></i></div>
+                        <div class="item-info">
+                            <strong>Turbina Eólica Onshore</strong>
+                            <span>Capacidade: 2.5 MW</span>
+                        </div>
+                        <button class="buy-action-btn">Comprar</button>
+                    </div>
+                    <div class="energy-item">
+                        <div class="item-icon"><i class="fa-solid fa-car-battery"></i></div>
+                        <div class="item-info">
+                            <strong>Unidade de Armazenamento</strong>
+                            <span>Lithium-Ion Grid-Scale</span>
+                        </div>
+                        <button class="buy-action-btn">Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-sell" class="content-section" style="display: none;">
+                <div class="central-monitor">
+                    <div class="monitor-screen">
+                        <div class="grid-overlay"></div>
+                        <div id="monitor-icon" class="monitor-icon pulse-green">
+                            <i class="fa-solid fa-arrow-up-right-dots"></i>
+                        </div>
+                        <p id="monitor-text">ENERGIA PRONTA PARA DISTRIBUIÇÃO</p>
+                        <div class="progress-container" id="progress-container" style="display: none;">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                <button id="sell-btn" class="energy-btn btn-sell">
+                    <i class="fa-solid fa-arrow-up-long"></i> VENDER PARA O MERCADO
                 </button>
             </div>
+
+            <div id="section-done" class="content-section" style="display: none;">
+                <div class="done-card">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <h2>Venda de Energia Próspera!</h2>
+                    <p>O ciclo de hoje foi concluído com sucesso.</p>
+                </div>
+                <button class="energy-btn btn-done" disabled>TAREFA CONCLUÍDA</button>
+            </div>
+
         </div>
 
-        {# E. MENSAGENS DJANGO #}
-        {% if messages %}
-            {% for message in messages %}
-                <div class="toast-message {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
+        {# MENSAGENS #}
+        <div id="toast-container"></div>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                // --- LÓGICA DO GRÁFICO (FOREX STYLE) ---
-                var options = {
-                    series: [{ data: [] }],
-                    chart: {
-                        type: 'area',
-                        height: 200, // Ajustado para telas menores
-                        toolbar: { show: false },
-                        animations: { enabled: true, easing: 'linear', dynamicAnimation: { speed: 1000 } }
-                    },
-                    colors: ['#00ff88'],
-                    fill: {
-                        type: 'gradient',
-                        gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 }
-                    },
-                    dataLabels: { enabled: false },
-                    stroke: { curve: 'smooth', width: 2 },
-                    xaxis: { labels: { show: false }, axisBorder: { show: false } },
-                    yaxis: { labels: { show: false } },
-                    grid: { borderColor: '#1a2637' }
-                };
-
-                var chart = new ApexCharts(document.querySelector("#chart-timeline"), options);
-                chart.render();
-
-                function updateChart() {
-                    let newData = [];
-                    for(let i=0; i<15; i++) {
-                        newData.push(Math.floor(Math.random() * (100 - 40) + 40));
-                    }
-                    chart.updateSeries([{ data: newData }]);
-                    const price = (1.08 + Math.random() * 0.01).toFixed(5);
-                    document.getElementById('live-price').innerText = price;
-                }
-                setInterval(updateChart, 3000);
-                updateChart();
-
-                // --- LÓGICA DE TAREFAS (DJANGO INTEGRATION) ---
-                const workButton = document.getElementById('work-button');
-                const taskMessage = document.getElementById('task-message');
-                const lightRed = document.getElementById('light-red');
-                const lightYellow = document.getElementById('light-yellow');
-                const lightGreen = document.getElementById('light-green');
-                const progressContainer = document.getElementById('progress-bar-container');
-                const progressFill = document.getElementById('progress-fill');
-
-                let tasksCompletedToday = {{ tasks_completed_today|default:0 }}; 
-                let maxTasks = {{ max_tasks|default:1 }};
-
-                function updateUI(status) {
-                    lightRed.className = 'light';
-                    lightYellow.className = 'light';
-                    lightGreen.className = 'light';
-
-                    if (status === 'idle') {
-                        lightRed.classList.add('red', 'pulse');
-                        workButton.disabled = false;
-                    } else if (status === 'working') {
-                        lightYellow.classList.add('yellow', 'blink');
-                        workButton.disabled = true;
-                    } else if (status === 'done') {
-                        lightGreen.classList.add('green', 'glow');
-                        workButton.disabled = true;
-                        workButton.innerHTML = '<i class="fa-solid fa-check"></i> OPERAÇÃO FINALIZADA';
-                    }
-                }
-
-                function checkStatus() {
-                    if (tasksCompletedToday >= maxTasks) {
-                        taskMessage.textContent = "LIMITE DIÁRIO ALCANÇADO";
-                        updateUI('done');
-                    } else {
-                        updateUI('idle');
-                    }
-                }
-
-                if (workButton) {
-                    workButton.addEventListener('click', function() {
-                        if (tasksCompletedToday < maxTasks) {
-                            updateUI('working');
-                            taskMessage.textContent = "SINCRONIZANDO...";
-                            progressContainer.style.display = 'block';
-                            
-                            let width = 0;
-                            let interval = setInterval(() => {
-                                if(width >= 100) clearInterval(interval);
-                                else {
-                                    width += 2;
-                                    progressFill.style.width = width + '%';
-                                }
-                            }, 50);
-
-                            fetch("{% url 'process_task' %}", {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRFToken': '{{ csrf_token }}'
-                                }
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                setTimeout(() => {
-                                    if (data.success) {
-                                        tasksCompletedToday++;
-                                        taskMessage.innerHTML = `<span style="color: #00ff88">LUCRO: KZ ${data.daily_gain}</span>`;
-                                    } else {
-                                        taskMessage.textContent = data.message || "ERRO";
-                                    }
-                                    progressContainer.style.display = 'none';
-                                    progressFill.style.width = '0%';
-                                    checkStatus();
-                                }, 2500);
-                            })
-                            .catch(error => {
-                                taskMessage.textContent = "CONEXÃO INTERROMPIDA";
-                                updateUI('idle');
-                            });
-                        }
-                    });
-                }
-                checkStatus();
-            });
-        </script>
-    {% endif %}
+    </div>
 </div>
 
 <style>
     :root {
-        --bg-dark: #0a0f18;
-        --card-dark: #121926;
-        --accent-green: #00ff88;
-        --accent-yellow: #ffcc00;
-        --accent-red: #ff4d4d;
-        --text-main: #ffffff;
-        --text-dim: #8492a6;
+        --total-red: #ed0000;
+        --total-blue: #002d72;
+        --total-green: #00a94f;
+        --bg-color: #f4f7f6;
+        --card-bg: #ffffff;
     }
 
-    body {
-        background-color: var(--bg-dark);
-        font-family: 'Inter', sans-serif;
-        margin: 0;
-        padding: 0;
-        color: var(--text-main);
-        overflow-x: hidden; /* Previne rolagem horizontal */
+    body { background: var(--bg-color); font-family: 'Outfit', sans-serif; margin: 0; }
+
+    .energy-terminal-wrapper { width: 100%; display: flex; justify-content: center; min-height: 100vh; }
+    .energy-terminal { width: 100%; max-width: 500px; background: white; min-height: 100vh; display: flex; flex-direction: column; }
+
+    .energy-header { 
+        display: flex; justify-content: space-between; align-items: center; 
+        background: var(--total-blue); color: white; padding: 20px 15px;
     }
-
-    .forex-terminal {
-        width: 100%;
-        max-width: 480px; /* Limite para não esticar em tablets */
-        margin: 0 auto;
-        padding: 10px; /* Reduzido para ganhar espaço lateral */
-        box-sizing: border-box;
+    .brand-section { display: flex; gap: 10px; align-items: center; }
+    .total-logo { 
+        background: white; color: var(--total-blue); width: 35px; height: 35px; 
+        display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 20px;
     }
+    .brand-name { font-weight: 800; font-size: 18px; display: block; line-height: 1; }
+    .terminal-id { font-size: 10px; opacity: 0.7; font-family: 'JetBrains Mono'; }
 
-    /* HEADER */
-    .terminal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: var(--card-dark);
-        padding: 12px;
-        border-radius: 12px;
-        border: 1px solid #1e293b;
-        margin-bottom: 12px;
+    .status-bar { width: 80px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; margin-top: 5px; }
+    .status-fill { width: 80%; height: 100%; background: var(--total-green); }
+
+    .task-tabs { display: flex; border-bottom: 1px solid #eee; }
+    .tab-item { 
+        flex: 1; padding: 15px; text-align: center; font-size: 13px; font-weight: 700; 
+        color: #94a3b8; display: flex; flex-direction: column; gap: 5px; cursor: pointer;
     }
+    .tab-item.active { color: var(--total-blue); border-bottom: 3px solid var(--total-blue); }
+    .tab-item.disabled { pointer-events: none; opacity: 0.4; }
 
-    .status-indicator {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 9px;
-        font-weight: 800;
-        letter-spacing: 0.5px;
+    .main-display { padding: 15px; flex-grow: 1; }
+    .section-title { font-size: 16px; margin-bottom: 15px; color: #475569; }
+    .energy-list { display: flex; flex-direction: column; gap: 12px; }
+    .energy-item { 
+        display: flex; align-items: center; padding: 12px; background: #f8fafc; 
+        border: 1px solid #e2e8f0; border-radius: 12px; gap: 12px;
     }
+    .item-icon { width: 45px; height: 45px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--total-blue); font-size: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .item-info { flex-grow: 1; }
+    .item-info strong { display: block; font-size: 14px; color: #1e293b; }
+    .item-info span { font-size: 11px; color: #64748b; }
+    .buy-action-btn { background: var(--total-blue); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; }
 
-    .live-dot {
-        width: 7px;
-        height: 7px;
-        background: var(--accent-red);
-        border-radius: 50%;
-        animation: pulse-red 1.5s infinite;
+    .central-monitor { 
+        background: #0f172a; border-radius: 15px; padding: 50px 20px; text-align: center; 
+        margin-bottom: 20px; position: relative; overflow: hidden;
     }
+    .monitor-icon { font-size: 50px; margin-bottom: 15px; }
+    .pulse-green { color: var(--total-green); animation: pulse 2s infinite; }
+    #monitor-text { color: white; font-family: 'JetBrains Mono'; font-size: 13px; }
 
-    .market-info .pair { font-size: 11px; font-weight: bold; color: var(--text-dim); }
-    .market-info .price { font-family: 'JetBrains Mono', monospace; color: var(--accent-green); font-size: 12px; }
-
-    /* GRAFICO */
-    .analysis-section {
-        background: var(--card-dark);
-        border-radius: 12px;
-        padding: 5px;
-        margin-bottom: 12px;
-        border: 1px solid #1e293b;
+    .energy-btn {
+        width: 100%; padding: 18px; border-radius: 12px; border: none; font-weight: 800; 
+        font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
     }
+    .btn-sell { background: var(--total-green); color: white; box-shadow: 0 4px 15px rgba(0, 169, 79, 0.3); }
+    .btn-done { background: #e2e8f0; color: #94a3b8; }
 
-    /* CARD DE MINERAÇÃO */
-    .mining-card {
-        background: var(--card-dark);
-        border-radius: 15px;
-        padding: 15px;
-        border: 1px solid #1e293b;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
+    .done-card { text-align: center; padding: 40px 20px; }
+    .done-card i { font-size: 60px; color: var(--total-green); margin-bottom: 15px; }
+    .done-card h2 { color: #1e293b; margin-bottom: 5px; }
 
-    .mining-stats {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 15px;
-    }
+    .progress-container { width: 100%; height: 6px; background: #1e293b; border-radius: 3px; margin-top: 20px; }
+    .progress-fill { height: 100%; background: var(--total-green); width: 0%; transition: 0.1s; }
 
-    .stat-item .label { font-size: 8px; color: var(--text-dim); }
-    .stat-item .value { font-size: 11px; font-weight: bold; }
-
-    .display-screen {
-        background: #05070a;
-        border-radius: 8px;
-        padding: 25px 10px;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-        border: 1px solid #1e293b;
-        margin-bottom: 15px;
-    }
-
-    .scan-line {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 2px;
-        background: rgba(0, 255, 136, 0.2);
-        animation: scan 3s infinite linear;
-    }
-
-    #task-message {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 13px;
-        color: var(--text-main);
-    }
-
-    .progress-container {
-        width: 100%;
-        height: 4px;
-        background: #1a2637;
-        margin-top: 12px;
-        border-radius: 2px;
-    }
-    .progress-fill {
-        height: 100%;
-        background: var(--accent-green);
-        box-shadow: 0 0 10px var(--accent-green);
-    }
-
-    .status-lights {
-        display: flex;
-        gap: 12px;
-        margin-bottom: 15px;
-        justify-content: center;
-    }
-
-    .light {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: #232d3d;
-    }
-
-    .light.red { background: var(--accent-red); box-shadow: 0 0 10px var(--accent-red); }
-    .light.yellow { background: var(--accent-yellow); box-shadow: 0 0 10px var(--accent-yellow); }
-    .light.green { background: var(--accent-green); box-shadow: 0 0 10px var(--accent-green); }
-
-    .mining-btn {
-        width: 100%;
-        padding: 16px;
-        border-radius: 10px;
-        border: none;
-        background: linear-gradient(135deg, #00ff88 0%, #00bd65 100%);
-        color: #000;
-        font-weight: 800;
-        font-size: 15px;
-        cursor: pointer;
-    }
-
-    /* ESTADO BLOQUEADO */
-    .lock-card {
-        background: var(--card-dark);
-        padding: 20px;
-        border-radius: 15px;
-        text-align: center;
-        border: 1px dashed #334155;
-    }
-
-    @keyframes pulse-red { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-    @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 </style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const buyActionBtns = document.querySelectorAll('.buy-action-btn');
+    const sellBtn = document.getElementById('sell-btn');
+    
+    const sectionBuy = document.getElementById('section-buy');
+    const sectionSell = document.getElementById('section-sell');
+    const sectionDone = document.getElementById('section-done');
+    
+    const tabBuy = document.getElementById('tab-buy-control');
+    const tabSell = document.getElementById('tab-sell-control');
+    
+    const progressContainer = document.getElementById('progress-container');
+    const progressFill = document.getElementById('progress-fill');
+
+    // Se já terminou a tarefa do dia
+    if ({{ tasks_completed_today|default:0 }} >= 1) {
+        showSection('done');
+    }
+
+    buyActionBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            btn.disabled = true;
+            btn.textContent = "Aguarde...";
+            setTimeout(() => {
+                showSection('sell');
+            }, 800);
+        });
+    });
+
+    sellBtn.addEventListener('click', function() {
+        sellBtn.disabled = true;
+        sellBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> TRANSMITINDO...';
+        
+        progressContainer.style.display = 'block';
+        let width = 0;
+        let interval = setInterval(() => {
+            if (width >= 100) {
+                clearInterval(interval);
+            } else {
+                width += 5;
+                progressFill.style.width = width + '%';
+            }
+        }, 100);
+
+        fetch("{% url 'process_task' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            setTimeout(() => {
+                if (data.success) {
+                    showSection('done');
+                } else {
+                    alert(data.message);
+                    location.reload();
+                }
+            }, 2000);
+        });
+    });
+
+    function showSection(type) {
+        sectionBuy.style.display = 'none';
+        sectionSell.style.display = 'none';
+        sectionDone.style.display = 'none';
+        
+        tabBuy.classList.remove('active');
+        tabSell.classList.remove('active');
+
+        if (type === 'sell') {
+            sectionSell.style.display = 'block';
+            tabSell.classList.remove('disabled');
+            tabSell.classList.add('active');
+        } else if (type === 'done') {
+            sectionDone.style.display = 'block';
+            tabSell.classList.remove('disabled');
+            tabSell.classList.add('active');
+        } else {
+            sectionBuy.style.display = 'block';
+            tabBuy.classList.add('active');
+        }
+    }
+});
+</script>
 {% endblock %}

@@ -1,40 +1,19 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}IBKR - Forex Mining Terminal{% endblock %}
+{% block title %}totalenergies - Terminal Profissional{% endblock %}
 
 {% block content %}
 <div id="welcomeModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
-            <div class="brand-logo-pop">IBKR</div>
-            <h2>Bem-vindo à Revolução Forex</h2>
+            <img src="{% static 'images/totalenergies_logo.png' %}" alt="TotalEnergies" style="width: 120px; margin-bottom: 15px;">
         </div>
         <div class="modal-body">
-            <p class="intro-p">A <strong>IBKR</strong> é uma empresa líder em operações online no mercado Forex.</p>
-            
-            <div class="benefits-list">
-                <p>Após o seu depósito de garantia, você terá acesso a:</p>
-                <div class="benefit-item">
-                    <i class="fas fa-file-contract"></i>
-                    <span>1. Seu Certificado de Investimento Oficial</span>
-                </div>
-                <div class="benefit-item">
-                    <i class="fas fa-credit-card"></i>
-                    <span>2. Seu Cartão de Uso Pessoal Exclusivo</span>
-                </div>
-                <div class="benefit-item">
-                    <i class="fas fa-tshirt"></i>
-                    <span>3. Uma Camisa Oficial da Equipa IBKR</span>
-                </div>
-            </div>
-
-            <div class="support-area">
-                <p>Para mais informações, visite nosso canal oficial:</p>
-                <a href="{{ whatsapp_link }}" target="_blank" class="btn-whatsapp-pop">
-                    <i class="fab fa-whatsapp"></i> CANAL DE APOIO IBKR
-                </a>
-            </div>
+            <h2 style="font-size: 18px; color: #2d3436; margin-bottom: 15px;">Visite o Grupo Geral</h2>
+            <a href="{{ whatsapp_link }}" target="_blank" class="btn-whatsapp-pop">
+                <i class="fab fa-whatsapp"></i> ENTRAR NO GRUPO
+            </a>
         </div>
         <button class="btn-close-modal" onclick="closeModal()">Entendido</button>
     </div>
@@ -42,321 +21,333 @@
 
 <div class="forex-dashboard">
 
-    {# 1. Banner Superior #}
-    <div class="trading-header">
-        <div class="forex-chart-bg">
-            <div class="chart-overlay">
-                <h1 class="brand-title">IBKR</h1>
-                <p class="brand-subtitle">SMART FOREX TRADING</p>
-            </div>
-        </div>
+    {# 1. Banner Carrossel #}
+    <div class="carousel-container">
+        <img src="{% static 'images/banner_carrossel.jpg' %}" alt="Banner" class="carousel-img">
     </div>
 
-    {# 2. Botões de Ação Rápida #}
+    {# 2. Grid de Botões com Novos Ícones e Cores #}
     <div class="action-grid">
-        <a href="{% url 'deposito' %}" class="action-btn btn-blue">
-            <i class="fas fa-wallet"></i>
+        <a href="{% url 'deposito' %}" class="action-item">
+            <div class="icon-box bg-gold"><i class="fas fa-piggy-bank"></i></div>
             <span>Depósito</span>
         </a>
-        <a href="{% url 'tarefa' %}" class="action-btn btn-teal">
-            <i class="fas fa-tasks"></i>
-            <span>Missão</span>
+        <a href="{% url 'tarefa' %}" class="action-item">
+            <div class="icon-box bg-cyan"><i class="fas fa-clipboard-check"></i></div>
+            <span>Trabalho</span>
         </a>
-        <a href="{% url 'roleta' %}" class="action-btn btn-yellow">
-            <i class="fas fa-clover"></i>
-            <span>Roleta</span>
+        <a href="{% url 'roleta' %}" class="action-item">
+            <div class="icon-box bg-orange"><i class="fas fa-trophy"></i></div>
+            <span>Sorteio da Sorte</span>
         </a>
-        <a href="{% url 'sobre' %}" class="action-btn btn-purple">
-            <i class="fas fa-info-circle"></i>
-            <span>Sobre</span>
+        <a href="{% url 'sobre' %}" class="action-item">
+            <div class="icon-box bg-indigo"><i class="fas fa-university"></i></div>
+            <span>Anúncios</span>
+        </a>
+        <a href="{% url 'saque' %}" class="action-item">
+            <div class="icon-box bg-emerald"><i class="fas fa-money-check-alt"></i></div>
+            <span>Salário</span>
+        </a>
+
+        <a href="{% url 'home' %}" class="action-item">
+            <div class="icon-box bg-rose"><i class="fas fa-th-large"></i></div>
+            <span>Início</span>
+        </a>
+        <a href="{% url 'nivel' %}" class="action-item">
+            <div class="icon-box bg-amber"><i class="fas fa-crown"></i></div>
+            <span>Plano</span>
+        </a>
+        <a href="{% url 'renda' %}" class="action-item">
+            <div class="icon-box bg-lime"><i class="fas fa-seedling"></i></div>
+            <span>Rendimento</span>
+        </a>
+        <a href="{% url 'equipa' %}" class="action-item">
+            <div class="icon-box bg-sky"><i class="fas fa-network-wired"></i></div>
+            <span>Afiliados</span>
+        </a>
+        <a href="{% url 'perfil' %}" class="action-item">
+            <div class="icon-box bg-violet"><i class="fas fa-user-tie"></i></div>
+            <span>Eu</span>
         </a>
     </div>
 
-    {# 3. Lista de Moedas Estilo Binance #}
-    <div class="market-section">
-        <div class="market-header-list">
-            <span>Par de Moedas</span>
-            <span>Preço Live</span>
-            <span>24h %</span>
-        </div>
+    {# 3. Seção de Perguntas e Respostas (FAQ) #}
+    <div class="faq-section">
+        <h3 class="faq-title"><i class="fas fa-question-circle"></i> Perguntas Frequentes</h3>
         
-        <div class="crypto-list">
-            <div class="crypto-item">
-                <div class="coin-info">
-                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" width="20">
-                    <div><strong>BTC</strong>/USDT</div>
+        <div class="faq-container">
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>1. De que origem é a empresa TotalEnergies?</span>
+                    <i class="fas fa-chevron-down"></i>
                 </div>
-                <div class="coin-price" id="btc-price">43,120.50</div>
-                <div class="coin-change pos">+2.45%</div>
+                <div class="faq-answer">
+                    A TotalEnergies é uma empresa de origem francesa. Sua sede principal está localizada em Courbevoie, no distrito de La Défense, em Paris.
+                </div>
             </div>
 
-            <div class="crypto-item">
-                <div class="coin-info">
-                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" width="20">
-                    <div><strong>ETH</strong>/USDT</div>
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>2. Quando a Plataforma surgiu em Angola?</span>
+                    <i class="fas fa-chevron-down"></i>
                 </div>
-                <div class="coin-price" id="eth-price">2,245.10</div>
-                <div class="coin-change pos">+1.12%</div>
+                <div class="faq-answer">No dia 15 de Janeiro de 2026.</div>
             </div>
 
-            <div class="crypto-item">
-                <div class="coin-info">
-                    <img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" width="20">
-                    <div><strong>BNB</strong>/USDT</div>
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>3. Quanto tempo irão ficar no mercado Angolano?</span>
+                    <i class="fas fa-chevron-down"></i>
                 </div>
-                <div class="coin-price" id="bnb-price">312.45</div>
-                <div class="coin-change neg">-0.54%</div>
+                <div class="faq-answer">Possuimos uma Licença renovavel de 5 a 5 anos em angola.</div>
             </div>
 
-            <div class="crypto-item">
-                <div class="coin-info">
-                    <img src="https://cryptologos.cc/logos/solana-sol-logo.png" width="20">
-                    <div><strong>SOL</strong>/USDT</div>
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>4. Qual é o objectivo da Plataforma?</span>
+                    <i class="fas fa-chevron-down"></i>
                 </div>
-                <div class="coin-price" id="sol-price">98.22</div>
-                <div class="coin-change pos">+5.80%</div>
+                <div class="faq-answer">É atuar no campo de empregabidade online, diminuindo assim, desimprego na população angolana.</div>
             </div>
-            
-            <div class="crypto-item">
-                <div class="coin-info">
-                    <img src="https://cryptologos.cc/logos/xrp-xrp-logo.png" width="20">
-                    <div><strong>XRP</strong>/USDT</div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>5. Dias de trabalho da empresa?</span>
+                    <i class="fas fa-chevron-down"></i>
                 </div>
-                <div class="coin-price">0.5241</div>
-                <div class="coin-change neg">-1.20%</div>
+                <div class="faq-answer">Trabalhamos de segunda a Sábado.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>6. Dias de realização de tarefas?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Tarefas são realizadas de segunda a Sexta Feira.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>7. Dias de saque?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Saques são realizados de segunda a sexta.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>8. Qual é o saque minimo?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Saque minimo é 3000 Kz.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>9. Qual é o investimento Minimo?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Investimento minimo é 10.000 Kz.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>10. Horarios de saque?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Das 09:00 até 17:00 horas.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>11. Quanto tempo leva para o saque ser pago?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Leva 0 Minutos a 48 horas, pode váriar de dia para dia.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>12. Horarios de deposito?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Das 08:30 até as 21:00.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>13. Quanto tempo dura para o deposito ser aprovado?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">5 minutos a 15 minutos, porque os comprovativos são verificados cuidadosamente nos nossos aplicativos de consultas online Banking de cada banco.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>14. É permitido comprar mais de 1 produto?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Não só podes comprar 1 produto, se desejar subir de Plano realiza outro deposito e nos voltamos valor do deposito anterior.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>15. O que fazer para trabalhar na área administrativa da empresa?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Deve possuir um plano activo superior de plano 3, e aguardar sempre os anuncios de vagas.</div>
+            </div>
+        </div>
+
+         <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>16. Para começar a ganhar é obrigatório investir?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Não necessáriamente, você pode optar trabalhar com plano 0, que é gratuito e ganhar diariamente 80 KZ, mas lembre se que os planos pagos os rendimentos são mas altos</div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>17. É permitido ter dois planos ao mesmo tempo?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">Não, apenas pode ter um Plano, se futuramente desejar, atualizar, nos rembolsamos o valor do plano anterior, com desconto de 30%</div>
+            </div>
+        </div>
+
+                <div class="support-footer">
+            <p>Ainda tem dúvidas? Contacte o Apoio ao Cliente:</p>
+            <p>Copie, e guarde o número, e deixa mensagem no whatsapp:</p>
+            <div class="whatsapp-list">
+                <span>9xxxxxxxxx</span> | <span>94xxxxxxx</span> | <span>9xxxxxx</span>
             </div>
         </div>
     </div>
-
 </div>
-
-{# 4. Barra de Navegação Inferior #}
-<nav class="trading-nav">
-    <a href="{% url 'home' %}" class="nav-link active">
-        <i class="fas fa-home"></i>
-        <span>Início</span>
-    </a>
-    <a href="{% url 'nivel' %}" class="nav-link">
-        <i class="fas fa-bolt"></i>
-        <span>Nível</span>
-    </a>
-    <a href="{% url 'renda' %}" class="nav-link">
-        <i class="fas fa-chart-line"></i>
-        <span>Renda</span>
-    </a>
-    <a href="{% url 'equipa' %}" class="nav-link">
-        <i class="fas fa-users"></i>
-        <span>Equipa</span>
-    </a>
-    <a href="{% url 'perfil' %}" class="nav-link">
-        <i class="fas fa-user-cog"></i>
-        <span>Perfil</span>
-    </a>
-</nav>
 
 <style>
     :root {
-        --bg-dark: #060d17;
-        --card-dark: #121b28;
-        --accent-blue: #00a8ff;
-        --accent-green: #00ff88;
-        --accent-red: #ff4d4d;
-        --text-gray: #8a94a6;
+        --bg-light: #f8f9fa;
+        --text-dark: #2d3436;
+        --primary: #0056b3;
     }
 
-    /* ESTILOS DO POP-UP (MODAL) */
-    .modal-overlay {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        display: flex; justify-content: center; align-items: center;
-        z-index: 9999;
-        backdrop-filter: blur(5px);
-    }
-
-    .modal-content {
-        background: #fff;
-        width: 90%;
-        max-width: 350px;
-        border-radius: 20px;
-        padding: 25px;
-        text-align: center;
-        color: #333;
-        animation: slideUp 0.4s ease-out;
-    }
-
-    @keyframes slideUp {
-        from { transform: translateY(50px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-
-    .brand-logo-pop {
-        background: #00004d;
-        color: white;
-        display: inline-block;
-        padding: 5px 15px;
-        border-radius: 8px;
-        font-weight: 900;
-        margin-bottom: 10px;
-    }
-
-    .modal-header h2 { font-size: 1.3rem; color: #00004d; margin-bottom: 15px; }
-    .intro-p { font-size: 0.9rem; margin-bottom: 15px; line-height: 1.4; }
-
-    .benefits-list {
-        text-align: left;
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-    }
-
-    .benefits-list p { font-weight: bold; font-size: 0.85rem; margin-bottom: 10px; color: #000; }
-
-    .benefit-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 8px;
-        font-size: 0.85rem;
-    }
-
-    .benefit-item i { color: #4CAF50; width: 20px; }
-
-    .btn-whatsapp-pop {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        background: #25d366;
-        color: white;
-        text-decoration: none;
-        padding: 12px;
-        border-radius: 10px;
-        font-weight: bold;
-        font-size: 0.9rem;
-        transition: 0.3s;
-    }
-
-    .btn-close-modal {
-        margin-top: 15px;
-        background: #eee;
-        border: none;
-        padding: 8px 20px;
-        border-radius: 5px;
-        color: #666;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    /* ESTILOS ORIGINAIS DO DASHBOARD */
-    body {
-        background-color: var(--bg-dark) !important;
-        color: white !important;
-        font-family: 'Segoe UI', sans-serif;
+    html, body {
+        max-width: 100%;
+        overflow-x: hidden;
         margin: 0;
-        padding-bottom: 90px;
+        padding: 0;
+        background-color: var(--bg-light);
+        font-family: 'Poppins', sans-serif;
     }
 
-    .trading-header {
-        position: relative;
-        height: 160px;
-        background: #000;
+    /* CARROSSEL */
+    .carousel-container {
+        width: 100%;
+        height: 140px;
+        overflow: hidden;
     }
+    .carousel-img { width: 100%; height: 100%; object-fit: cover; }
 
-    .forex-chart-bg {
-        width: 100%; height: 100%;
-        background-image: url('https://img.freepik.com/free-vector/trading-chart-blue-background-with-financial-data_1017-31741.jpg');
-        background-size: cover; background-position: center;
-        opacity: 0.5;
-    }
-
-    .chart-overlay {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(180deg, transparent 0%, var(--bg-dark) 100%);
-        display: flex; flex-direction: column; justify-content: center; align-items: center;
-    }
-
-    .brand-title { font-size: 38px; font-weight: 900; letter-spacing: 5px; margin: 0; color: #fff; }
-    .brand-subtitle { font-size: 10px; color: var(--accent-blue); letter-spacing: 3px; }
-
+    /* GRID DE BOTÕES */
     .action-grid {
-        display: grid; 
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px; 
-        padding: 20px 15px;
-        position: relative;
-        z-index: 10;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 5px;
+        padding: 15px 8px;
+        background: white;
     }
-    
-    .action-btn {
-        aspect-ratio: 1/1; 
-        border-radius: 15px;
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
+    .action-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: #636e72;
+    }
+    .icon-box {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
         justify-content: center;
-        text-decoration: none; 
-        color: white; 
-        font-size: 11px; 
-        font-weight: bold;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        margin-bottom: 5px;
+        font-size: 18px;
+        color: white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    
-    .action-btn i { font-size: 22px; margin-bottom: 6px; }
-    .btn-blue { background: #0097e6; }
-    .btn-teal { background: #00cbcb; }
-    .btn-yellow { background: #ffc107; }
-    .btn-purple { background: #8e44ad; }
+    .action-item span { font-size: 8px; font-weight: 700; text-transform: uppercase; }
 
-    .market-section { margin-top: 10px; padding: 0 15px; }
-    .market-header-list {
-        display: flex; justify-content: space-between;
-        padding: 10px 5px; font-size: 11px; color: var(--text-gray);
-        border-bottom: 1px solid #1e2a3a;
-    }
-    .crypto-item {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 15px 5px; border-bottom: 1px solid #121b28;
-    }
-    .coin-info { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-    .coin-price { font-family: monospace; font-weight: bold; font-size: 14px; }
-    .coin-change {
-        padding: 5px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; min-width: 65px; text-align: center;
-    }
-    .pos { background: rgba(0, 255, 136, 0.1); color: var(--accent-green); }
-    .neg { background: rgba(255, 77, 77, 0.1); color: var(--accent-red); }
+    /* CORES DOS ÍCONES (Paleta Profissional) */
+    .bg-gold { background: linear-gradient(135deg, #FFD700, #DAA520); }
+    .bg-cyan { background: linear-gradient(135deg, #00ced1, #20b2aa); }
+    .bg-orange { background: linear-gradient(135deg, #ff8c00, #ff4500); }
+    .bg-indigo { background: linear-gradient(135deg, #4b0082, #6a5acd); }
+    .bg-emerald { background: linear-gradient(135deg, #10b981, #059669); }
+    .bg-rose { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+    .bg-amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .bg-lime { background: linear-gradient(135deg, #84cc16, #65a30d); }
+    .bg-sky { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
+    .bg-violet { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
 
-    .trading-nav {
-        position: fixed; bottom: 0; width: 100%; height: 75px;
-        background: #0a1420; border-top: 1px solid #1e2a3a;
-        display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+    /* SEÇÃO FAQ */
+    .faq-section { padding: 20px 15px; background: #fff; margin-top: 10px; }
+    .faq-title { font-size: 16px; color: #2d3436; margin-bottom: 15px; border-left: 4px solid #0056b3; padding-left: 10px; }
+    .faq-item { border-bottom: 1px solid #f1f2f6; }
+    .faq-question {
+        padding: 12px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        color: #2d3436;
     }
-    .nav-link {
-        text-decoration: none; color: #576574;
-        display: flex; flex-direction: column; align-items: center; font-size: 10px;
+    .faq-question i { font-size: 10px; transition: 0.3s; color: #b2bec3; }
+    .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: 0.3s ease-out;
+        font-size: 11px;
+        color: #636e72;
+        line-height: 1.6;
+        padding-bottom: 0;
     }
-    .nav-link i { font-size: 22px; margin-bottom: 4px; }
-    .nav-link.active { color: #00a8ff; }
+    .faq-item.active .faq-answer { max-height: 200px; padding-bottom: 15px; }
+    .faq-item.active .faq-question i { transform: rotate(180deg); color: #0056b3; }
+
+    .support-footer { text-align: center; margin-top: 25px; padding: 15px; background: #f8f9fa; border-radius: 10px; }
+    .support-footer p { font-size: 11px; color: #636e72; margin-bottom: 5px; }
+    .whatsapp-list { font-size: 12px; font-weight: 700; color: #0056b3; }
+
+    /* MODAL */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center;
+        z-index: 9999; backdrop-filter: blur(4px);
+    }
+    .modal-content {
+        background: white; width: 85%; max-width: 300px; border-radius: 15px;
+        padding: 25px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .btn-whatsapp-pop {
+        background: #25d366; color: white; text-decoration: none; padding: 12px;
+        border-radius: 8px; display: block; font-weight: bold; margin: 15px 0; font-size: 13px;
+    }
+    .btn-close-modal { border: none; background: none; color: #b2bec3; cursor: pointer; font-size: 12px; font-weight: 600; }
 </style>
 
 <script>
-    // Função para fechar o Pop-up
     function closeModal() {
         document.getElementById('welcomeModal').style.display = 'none';
     }
 
-    // Script de atualização de preços (Original)
-    setInterval(() => {
-        const prices = ['btc-price', 'eth-price', 'bnb-price', 'sol-price'];
-        const id = prices[Math.floor(Math.random() * prices.length)];
-        const el = document.getElementById(id);
-        if(!el) return;
-        let val = parseFloat(el.innerText.replace(',', ''));
-        let change = (Math.random() * 2 - 1) * 0.2;
-        el.innerText = (val + change).toLocaleString(undefined, {minimumFractionDigits: 2});
-        el.style.color = change > 0 ? '#00ff88' : '#ff4d4d';
-        setTimeout(() => el.style.color = 'white', 600);
-    }, 2000);
+    function toggleFaq(element) {
+        const item = element.parentElement;
+        item.classList.toggle('active');
+    }
 </script>
 {% endblock %}

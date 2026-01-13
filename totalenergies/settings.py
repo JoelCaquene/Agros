@@ -1,5 +1,6 @@
 """
-Django settings for ibkr project.
+Django settings for totalenergies project.
+Configurado para Testagem Local e Produção.
 """
 
 from pathlib import Path
@@ -10,17 +11,19 @@ from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-SECRET_KEY = config('SECRET_KEY')
+# SEGURANÇA: DEBUG True para testagem local, False para hospedagem
+# No seu arquivo .env, defina DEBUG=True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-local-key-123')
 
 # ======================================================================
 # CONFIGURAÇÃO DOS HOSTS PERMITIDOS
 # ======================================================================
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 hosts_string = config('ALLOWED_HOSTS', default='')
-ALLOWED_HOSTS = [host.strip() for host in hosts_string.split(',') if host.strip()]
+if hosts_string:
+    ALLOWED_HOSTS.extend([host.strip() for host in hosts_string.split(',')])
 
 if not DEBUG:
     RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
@@ -54,7 +57,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ibkr.urls'
+ROOT_URLCONF = 'totalenergies.urls'
 
 TEMPLATES = [
     {
@@ -72,14 +75,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ibkr.wsgi.application'
+WSGI_APPLICATION = 'totalenergies.wsgi.application'
 
 # ======================================================================
-# DATABASE
+# DATABASE (SQLite para Local, URL para Produção)
 # ======================================================================
 DATABASES = {
     'default': dj_database_url.config(
-        default=config('DATABASE_URL', default=f'sqlite:///{BASE_DIR}/db.sqlite3'),
+        default=f'sqlite:///{BASE_DIR}/db.sqlite3',
         conn_max_age=600
     )
 }
@@ -91,37 +94,38 @@ USE_I18N = True
 USE_TZ = True
 
 # ======================================================================
-# STATIC FILES (CSS, JS, Imagens do Sistema)
+# STATIC FILES (CSS, JS)
 # ======================================================================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# Armazenamento de arquivos estáticos (WhiteNoise)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Localmente usamos o padrão, em produção usamos o WhiteNoise comprimido
+if DEBUG:
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+else:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ======================================================================
-# MEDIA FILES (Uploads de usuários - Comprovantes, etc)
+# MEDIA FILES (Uploads)
 # ======================================================================
-# Em produção no Render (sem Cloudinary), salvamos na pasta media local
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Garante que a pasta media existe para evitar erros de permissão
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
 
-# Default storage padrão do Django para disco local
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 # ======================================================================
-# SEGURANÇA E OUTROS
+# SEGURANÇA (Desativado em DEBUG para permitir cadastro local)
 # ======================================================================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core.CustomUser'
 LOGIN_URL = 'login'
 
 if not DEBUG:
+    # Estas configs só ativam se DEBUG for False (Produção)
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
@@ -131,4 +135,8 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+else:
+    # Configurações para facilitar o desenvolvimento local
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
     

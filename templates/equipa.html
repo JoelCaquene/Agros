@@ -9,271 +9,407 @@
         
         <div class="top-nav">
             <a href="{% url 'menu' %}" class="back-btn">
-                <i class="fas fa-arrow-left"></i> Voltar
+                <i class="fas fa-chevron-left"></i> Voltar
             </a>
         </div>
 
         <div class="page-header-custom">
-            <h1>Minha Equipa <i class="fas fa-network-wired"></i></h1>
+            <h1>Minha Equipa <i class="fas fa-users" style="color: #4facfe;"></i></h1>
         </div>
 
-        <div class="invite-link-section">
+        <div class="summary-card-top">
+            <div class="summary-row">
+                <div class="summary-item left">
+                    <span class="label">Equipa Total</span>
+                    <span class="value">{{ team_count }}</span>
+                </div>
+                <div class="summary-item right">
+                    <span class="label">Subsídio Total</span>
+                    <span class="value currency">KZ {{ subsidy_balance|default:"0" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="invite-section">
+            <p class="invite-label">Link de Convite:</p>
             <div class="invite-box">
                 <span id="invite-link">{{ invite_link }}</span>
                 <button type="button" class="copy-button" id="copyBtn">
                     <i class="fas fa-copy"></i>
                 </button>
             </div>
-            <p style="color: #4fd1c5; font-size: 0.85rem; text-align: center; margin-top: -15px; font-weight: bold; text-shadow: 0 0 10px rgba(79, 209, 197, 0.3);">
-                Meu Código: {{ user.invite_code }}
-            </p>
+            <div class="code-text">Meu Código: <strong>{{ user.invite_code }}</strong></div>
         </div>
 
-        <div class="summary-area-grid">
+        <div class="team-grid">
             
-            <div class="stat-card level-card glow-blue">
-                <div class="level-badge">Nível A</div>
-                <div class="card-main-content">
-                    <div class="icon-wrapper"><i class="fas fa-user-tie"></i></div>
-                    <h4 class="card-title">Diretos</h4>
+            <div class="level-card">
+                <div class="card-header">
+                    <div class="icon-circle"><i class="fas fa-user-tie"></i></div>
+                    <div class="level-title">Nível 1 (20%)</div>
                 </div>
-                <div class="stats-info">
-                    <div class="stat-row"><span>Membros:</span> <strong>{{ level_a_count }}</strong></div>
-                    <div class="stat-row"><span>Investidores:</span> <strong>{{ level_a_investors }}</strong></div>
-                </div>
-                <div class="rule-box">
-                    <small>15% Invest. + 100 KZ Tarefa</small>
+                <div class="card-stats">
+                    <div class="stat-item"><span>Membros:</span> <strong>{{ level_a_count }}</strong></div>
+                    <div class="stat-item"><span>Ativos:</span> <strong>{{ level_a_investors }}</strong></div>
                 </div>
             </div>
 
-            <div class="stat-card level-card glow-purple">
-                <div class="level-badge">Nível B</div>
-                <div class="card-main-content">
-                    <div class="icon-wrapper"><i class="fas fa-users"></i></div>
-                    <h4 class="card-title">Nível 2</h4>
+            <div class="level-card">
+                <div class="card-header">
+                    <div class="icon-circle"><i class="fas fa-users"></i></div>
+                    <div class="level-title">Nível 2 (3%)</div>
                 </div>
-                <div class="stats-info">
-                    <div class="stat-row"><span>Membros:</span> <strong>{{ level_b_count }}</strong></div>
-                    <div class="stat-row"><span>Investidores:</span> <strong>{{ level_b_investors }}</strong></div>
-                </div>
-                <div class="rule-box">
-                    <small>3% Invest. + 30 KZ Tarefa</small>
+                <div class="card-stats">
+                    <div class="stat-item"><span>Membros:</span> <strong>{{ level_b_count }}</strong></div>
+                    <div class="stat-item"><span>Ativos:</span> <strong>{{ level_b_investors }}</strong></div>
                 </div>
             </div>
 
-            <div class="stat-card level-card glow-cyan">
-                <div class="level-badge">Nível C</div>
-                <div class="card-main-content">
-                    <div class="icon-wrapper"><i class="fas fa-users-cog"></i></div>
-                    <h4 class="card-title">Nível 3</h4>
+            <div class="level-card">
+                <div class="card-header">
+                    <div class="icon-circle"><i class="fas fa-network-wired"></i></div>
+                    <div class="level-title">Nível 3 (2%)</div>
                 </div>
-                <div class="stats-info">
-                    <div class="stat-row"><span>Membros:</span> <strong>{{ level_c_count }}</strong></div>
-                    <div class="stat-row"><span>Investidores:</span> <strong>{{ level_c_investors }}</strong></div>
-                </div>
-                <div class="rule-box">
-                    <small>1% Invest. + 10 KZ Tarefa</small>
-                </div>
-            </div>
-
-            <div class="stat-card level-card glow-gold">
-                <div class="level-badge">Total</div>
-                <div class="card-main-content">
-                    <div class="icon-wrapper" style="color: #ecc94b;"><i class="fas fa-wallet"></i></div>
-                    <h4 class="card-title">Bónus Rede</h4>
-                </div>
-                <div class="stats-info">
-                    <div class="stat-row"><span>Total Equipa:</span> <strong>{{ team_count }}</strong></div>
-                    <div class="stat-row"><span>Subsidio:</span> <strong class="currency">KZ {{ subsidy_balance|default:"0" }}</strong></div>
-                </div>
-                <div class="rule-box" style="border: 1px solid #ecc94b;">
-                    <small>Ganhos acumulados da rede</small>
+                <div class="card-stats">
+                    <div class="stat-item"><span>Membros:</span> <strong>{{ level_c_count }}</strong></div>
+                    <div class="stat-item"><span>Ativos:</span> <strong>{{ level_c_investors }}</strong></div>
                 </div>
             </div>
 
         </div>
 
-        <div class="info-section">
-            <h3 class="info-title"><i class="fas fa-shield-alt"></i> Regras de Comissionamento</h3>
-            <p class="info-text"><strong>Nível A (Diretos):</strong> Seus convidados diretos. Receba 15% do investimento deles e 100 KZ por cada tarefa que eles fizerem.</p>
-            <p class="info-text"><strong>Nível B (Subordinados):</strong> Convidados do seu Nível A. Receba 3% do investimento e 30 KZ por tarefa.</p>
-            <p class="info-text"><strong>Nível C (Rede):</strong> Convidados do seu Nível B. Receba 1% do investimento e 10 KZ por tarefa.</p>
+        <div class="new-rules-section">
+            <h3><i class="fas fa-shield-alt"></i> Politica de Comissionamento</h3>
+            <div class="rule-item">
+                <p><strong>Nível 1:</strong> 20% das tarefas Afiliado (1).</p>
+            </div>
+            <div class="rule-item">
+                <p><strong>Nível 2:</strong> 3% das tarefas Afiliado (2).</p>
+            </div>
+            <div class="rule-item">
+                <p><strong>Nível 3:</strong> 2% das tarefas Afiliado (3).</p>
+            </div>
         </div>
+
+        <div class="network-details-card">
+            <div class="tabs-header">
+                <button class="tab-link active" onclick="openTab(event, 'tab-n1')">NÍVEL 1</button>
+                <button class="tab-link" onclick="openTab(event, 'tab-n2')">NÍVEL 2</button>
+                <button class="tab-link" onclick="openTab(event, 'tab-n3')">NÍVEL 3</button>
+            </div>
+
+            <div id="tab-n1" class="tab-content" style="display: block;">
+                <div class="member-list">
+                    {% for member in level_a %}
+                    <div class="member-item">
+                        <div class="m-info">
+                            <span class="m-phone"><i class="fas fa-phone-alt"></i> {{ member.phone_number }}</span>
+                            <span class="m-status {% if member.userlevel_set.all %}active-status{% endif %}">
+                                {% with active_vips=member.userlevel_set.all %}
+                                    {% if active_vips %}
+                                        {% for uv in active_vips %}{{ uv.level.name }}{% endfor %}
+                                    {% else %}
+                                        Plano 0
+                                    {% endif %}
+                                {% endwith %}
+                            </span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="empty-msg">Nenhum afiliado no Nível 1.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div id="tab-n2" class="tab-content">
+                <div class="member-list">
+                    {% for member in level_b %}
+                    <div class="member-item">
+                        <div class="m-info">
+                            <span class="m-phone"><i class="fas fa-phone-alt"></i> {{ member.phone_number }}</span>
+                            <span class="m-status {% if member.userlevel_set.all %}active-status{% endif %}">
+                                {% with active_vips=member.userlevel_set.all %}
+                                    {% if active_vips %}
+                                        {% for uv in active_vips %}{{ uv.level.name }}{% endfor %}
+                                    {% else %}
+                                        Plano 0
+                                    {% endif %}
+                                {% endwith %}
+                            </span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="empty-msg">Nenhum afiliado no Nível 2.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div id="tab-n3" class="tab-content">
+                <div class="member-list">
+                    {% for member in level_c %}
+                    <div class="member-item">
+                        <div class="m-info">
+                            <span class="m-phone"><i class="fas fa-phone-alt"></i> {{ member.phone_number }}</span>
+                            <span class="m-status {% if member.userlevel_set.all %}active-status{% endif %}">
+                                {% with active_vips=member.userlevel_set.all %}
+                                    {% if active_vips %}
+                                        {% for uv in active_vips %}{{ uv.level.name }}{% endfor %}
+                                    {% else %}
+                                        Plano 0
+                                    {% endif %}
+                                {% endwith %}
+                            </span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="empty-msg">Nenhum afiliado no Nível 3.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <style>
-    :root {
-        --deep-bg: #050a18;
-        --card-bg: #0d1b35;
-        --glow-blue: #007bff;
-        --text-white: #ffffff;
-        --text-gray: #a0aec0;
-    }
-
     .team-page-body {
-        background: radial-gradient(circle at top, #0d2446 0%, var(--deep-bg) 100%);
+        background-color: #ffffff;
         min-height: 100vh;
-        color: var(--text-white);
+        color: #333;
         font-family: 'Inter', sans-serif;
-        padding-bottom: 40px;
+        padding-bottom: 50px;
     }
 
     .team-container-wrapper {
-        max-width: 800px;
+        max-width: 500px;
         margin: 0 auto;
         padding: 15px;
     }
 
+    /* Navegação */
     .top-nav { margin-bottom: 15px; }
     .back-btn {
-        color: var(--text-white);
         text-decoration: none;
+        color: #333;
+        font-weight: bold;
         font-size: 0.9rem;
-        background: rgba(255,255,255,0.05);
-        padding: 8px 18px;
-        border-radius: 20px;
-        transition: 0.3s;
-        border: 1px solid rgba(255,255,255,0.1);
     }
-    .back-btn:hover { background: var(--glow-blue); border-color: transparent; }
 
     .page-header-custom h1 {
         font-size: 1.4rem;
+        color: #1a1a1a;
+        margin-bottom: 15px;
         text-align: center;
-        margin-bottom: 25px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: #fff;
     }
 
-    .invite-box {
-        background: var(--card-bg);
-        border: 1px solid rgba(0, 123, 255, 0.4);
-        padding: 12px 15px;
-        border-radius: 12px;
+    /* NOVO CARD DE RESUMO (Topo) */
+    .summary-card-top {
+        background: #1a1a1a;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        border: 1px solid #333;
+    }
+    .summary-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 25px;
-        box-shadow: 0 0 15px rgba(0, 123, 255, 0.1);
     }
-
-    #invite-link { 
-        font-size: 0.75rem; 
-        color: #4fd1c5; 
-        white-space: nowrap; 
-        overflow: hidden; 
-        text-overflow: ellipsis;
-        font-family: monospace;
-        margin-right: 10px;
-    }
-
-    .copy-button { 
-        background: var(--glow-blue); 
-        border: none; 
-        color: white; 
-        width: 40px;
-        height: 35px;
-        border-radius: 8px; 
-        cursor: pointer; 
-        transition: 0.2s;
-    }
-
-    .summary-area-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        margin-bottom: 25px;
-    }
-
-    .stat-card {
-        background: var(--card-bg);
-        border-radius: 15px;
-        padding: 15px;
-        position: relative;
-        border: 1px solid rgba(255,255,255,0.05);
+    .summary-item {
         display: flex;
         flex-direction: column;
+    }
+    .summary-item.right { text-align: right; }
+    .summary-item .label {
+        font-size: 0.75rem;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .summary-item .value {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #fff;
+    }
+    .summary-item .currency { color: #4facfe; }
+
+    /* Convite */
+    .invite-section {
+        background: #fdfdfd;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #eee;
+    }
+    .invite-label { font-size: 0.8rem; margin-bottom: 8px; color: #666; }
+    .invite-box {
+        display: flex;
+        background: #f1f1f1;
+        border-radius: 8px;
+        padding: 10px;
+        align-items: center;
         justify-content: space-between;
     }
-
-    .glow-blue { border-bottom: 3px solid #007bff; }
-    .glow-purple { border-bottom: 3px solid #9f7aea; }
-    .glow-cyan { border-bottom: 3px solid #38b2ac; }
-    .glow-gold { border-bottom: 3px solid #ecc94b; }
-
-    .level-badge {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        font-size: 0.6rem;
-        background: rgba(255,255,255,0.1);
-        padding: 2px 6px;
-        border-radius: 4px;
-        color: var(--text-gray);
+    #invite-link {
+        font-size: 0.75rem;
+        color: #333;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-family: monospace;
     }
-
-    .card-main-content { text-align: center; margin-bottom: 12px; }
-    .icon-wrapper { font-size: 1.8rem; color: var(--glow-blue); margin-bottom: 5px; }
-    .card-title { font-size: 0.9rem; margin: 0; font-weight: 600; }
-
-    .stats-info { font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
-    .stat-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
-    .stat-row span { color: var(--text-gray); }
-    .currency { color: #4fd1c5; font-weight: bold; }
-
-    .rule-box {
-        background: rgba(0,0,0,0.2);
-        margin-top: 10px;
-        padding: 6px;
+    .copy-button {
+        background: #1a1a1a;
+        color: #fff;
+        border: none;
         border-radius: 6px;
-        text-align: center;
-        font-size: 0.65rem;
-        color: var(--text-gray);
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+    .code-text { font-size: 0.8rem; margin-top: 10px; text-align: center; }
+
+    /* Grid de Cards Pretos */
+    .team-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
     }
 
-    .info-section {
-        background: rgba(13, 27, 53, 0.6);
-        padding: 20px;
+    .level-card {
+        background: #1a1a1a; /* Cor preta */
+        border-radius: 15px;
+        padding: 15px;
+        color: white;
+        border: 1px solid #333;
+        transition: 0.3s;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    .level-card:hover {
+        border-color: #4facfe;
+        box-shadow: 0 0 15px rgba(79, 172, 254, 0.4);
+    }
+
+    .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .icon-circle {
+        color: #4facfe;
+        font-size: 1.1rem;
+    }
+    .level-title { font-size: 0.8rem; font-weight: bold; }
+
+    .card-stats {
+        background: rgba(255,255,255,0.05);
+        padding: 8px;
+        border-radius: 8px;
+    }
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.7rem;
+        margin-bottom: 3px;
+    }
+    .stat-item span { color: #888; }
+
+    /* Regras */
+    .new-rules-section {
+        background: #f9f9f9;
+        padding: 15px;
         border-radius: 12px;
-        border-left: 4px solid var(--glow-blue);
+        border: 1px solid #eee;
+        margin-bottom: 20px;
     }
-    .info-title { font-size: 1rem; margin-bottom: 12px; color: var(--glow-blue); }
-    .info-text { font-size: 0.85rem; color: var(--text-gray); margin-bottom: 10px; line-height: 1.6; }
+    .new-rules-section h3 { font-size: 0.9rem; margin-bottom: 10px; }
+    .rule-item p { font-size: 0.8rem; margin: 5px 0; color: #555; }
 
-    @media (max-width: 480px) {
-        .summary-area-grid { gap: 10px; }
-        .page-header-custom h1 { font-size: 1.2rem; }
+    /* ESTILO DO NOVO CARD DE REDE (ABAS) */
+    .network-details-card {
+        background: #fff;
+        border-radius: 15px;
+        overflow: hidden;
+        border: 1px solid #eee;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    .tabs-header {
+        display: flex;
+        background: #1a1a1a;
+    }
+    .tab-link {
+        flex: 1;
+        padding: 15px;
+        border: none;
+        background: none;
+        color: #888;
+        font-weight: bold;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: 0.3s;
+        border-bottom: 2px solid transparent;
+    }
+    .tab-link.active {
+        color: #4facfe;
+        border-bottom: 2px solid #4facfe;
+        background: rgba(79, 172, 254, 0.05);
+    }
+    .tab-content {
+        display: none;
+        padding: 10px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .member-item {
+        padding: 12px;
+        border-bottom: 1px solid #f1f1f1;
+    }
+    .m-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .m-phone { font-size: 0.85rem; font-weight: 600; color: #333; }
+    .m-status {
+        font-size: 0.7rem;
+        background: #f1f1f1;
+        padding: 4px 8px;
+        border-radius: 6px;
+        color: #777;
+    }
+    .active-status {
+        background: #e0f2fe;
+        color: #0369a1;
+        font-weight: bold;
+    }
+    .empty-msg { text-align: center; color: #999; font-size: 0.8rem; padding: 20px; }
+
+    @media (max-width: 450px) {
+        .team-grid { grid-template-columns: 1fr; }
     }
 </style>
 
 <script>
     document.getElementById('copyBtn').addEventListener('click', function() {
         const textToCopy = document.getElementById('invite-link').innerText;
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                showSuccess(this);
-            });
-        } else {
-            const textArea = document.createElement("textarea");
-            textArea.value = textToCopy;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            showSuccess(this);
-        }
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            const original = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => { this.innerHTML = original; }, 2000);
+        });
     });
 
-    function showSuccess(btn) {
-        const originalContent = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i>';
-        btn.style.backgroundColor = '#28a745';
-        setTimeout(() => {
-            btn.innerHTML = originalContent;
-            btn.style.backgroundColor = '';
-        }, 2000);
+    // Função para as Abas
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tab-link");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
     }
 </script>
 {% endblock %}
