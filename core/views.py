@@ -100,20 +100,29 @@ def user_logout(request):
     logout(request)
     return redirect('menu')
 
-# --- DEPÓSITO ---
+# --- DEPÓSITO (ATUALIZADO COM MULTI-MÉTODOS) ---
 @login_required
 def deposito(request):
     platform_bank_details = PlatformBankDetails.objects.all()
-    deposit_instruction = PlatformSettings.objects.first().deposit_instruction if PlatformSettings.objects.first() else 'Instruções de depósito não disponíveis.'
+    platform_settings = PlatformSettings.objects.first()
+    deposit_instruction = platform_settings.deposit_instruction if platform_settings else 'Instruções não disponíveis.'
+    
     level_deposits = Level.objects.all().values_list('deposit_value', flat=True).distinct().order_by('deposit_value')
     level_deposits_list = [str(d) for d in level_deposits] 
 
     if request.method == 'POST':
         form = DepositForm(request.POST, request.FILES)
+        # Captura os dados extras do formulário manual
+        payment_method = request.POST.get('payment_method', 'bank')
+        payer_name = request.POST.get('payer_name', '')
+
         if form.is_valid():
             deposit = form.save(commit=False)
             deposit.user = request.user
+            deposit.payment_method = payment_method
+            deposit.payer_name = payer_name
             deposit.save()
+            
             return render(request, 'deposito.html', {
                 'platform_bank_details': platform_bank_details,
                 'deposit_instruction': deposit_instruction,
@@ -121,7 +130,7 @@ def deposito(request):
                 'deposit_success': True 
             })
         else:
-            messages.error(request, 'Erro ao enviar o depósito.')
+            messages.error(request, 'Erro ao enviar o depósito. Verifique os campos.')
     
     form = DepositForm()
     context = {
@@ -141,9 +150,11 @@ def approve_deposit(request, deposit_id):
     if not deposit.is_approved:
         deposit.is_approved = True
         deposit.save()
+        
+        # Crédito do valor no saldo do usuário
         deposit.user.available_balance += deposit.amount
         deposit.user.save()
-        messages.success(request, 'Depósito aprovado.')
+        messages.success(request, f'Depósito de {deposit.amount} aprovado para {deposit.user.phone_number}.')
     return redirect('renda')
 
 # --- SAQUE ---
@@ -152,13 +163,21 @@ def saque(request):
     MIN_WITHDRAWAL_AMOUNT = 2500
     START_TIME = time(9, 0, 0)
     END_TIME = time(17, 0, 0)
-    withdrawal_instruction = PlatformSettings.objects.first().withdrawal_instruction if PlatformSettings.objects.first() else ''
+    
+    platform_settings = PlatformSettings.objects.first()
+    withdrawal_instruction = platform_settings.withdrawal_instruction if platform_settings else ''
     withdrawal_records = Withdrawal.objects.filter(user=request.user).order_by('-created_at')
     has_bank_details = BankDetails.objects.filter(user=request.user).exists()
+    
     now = timezone.localtime(timezone.now()).time()
     today = timezone.localdate(timezone.now())
     is_time_to_withdraw = START_TIME <= now <= END_TIME
-    withdrawals_today_count = Withdrawal.objects.filter(user=request.user, created_at__date=today, status__in=['Pendente', 'Aprovado']).count()
+    
+    withdrawals_today_count = Withdrawal.objects.filter(
+        user=request.user, 
+        created_at__date=today, 
+        status__in=['Pendente', 'Aprovado']
+    ).count()
     can_withdraw_today = withdrawals_today_count == 0
     
     if request.method == 'POST':
@@ -168,18 +187,18 @@ def saque(request):
             if not can_withdraw_today:
                 messages.error(request, 'Apenas 1 saque por dia.')
             elif not is_time_to_withdraw:
-                messages.error(request, 'Fora do horário de saque.')
+                messages.error(request, 'Horário de saque: 09:00 às 17:00.')
             elif not has_bank_details:
-                messages.error(request, 'Adicione coordenadas bancárias.')
+                messages.error(request, 'Adicione seus dados bancários no perfil primeiro.')
             elif amount < MIN_WITHDRAWAL_AMOUNT:
-                messages.error(request, 'Valor mínimo insuficiente.')
+                messages.error(request, f'O valor mínimo é {MIN_WITHDRAWAL_AMOUNT} Kz.')
             elif request.user.available_balance < amount:
                 messages.error(request, 'Saldo insuficiente.')
             else:
                 Withdrawal.objects.create(user=request.user, amount=amount)
                 request.user.available_balance -= amount
                 request.user.save()
-                messages.success(request, 'Saque solicitado.')
+                messages.success(request, 'Pedido de saque enviado com sucesso.')
                 return redirect('saque')
     else:
         form = WithdrawalForm()
@@ -195,15 +214,12 @@ def saque(request):
     }
     return render(request, 'saque.html', context)
 
-# --- TAREFA ---
+# --- TAREFAS ---
 @login_required
 def tarefa(request):
     user = request.user
     active_level = UserLevel.objects.filter(user=user, is_active=True).first()
-    
-    # Se não tem VIP, ele é "Estagiário"
     is_estagiario = active_level is None
-    
     today = timezone.localdate()
     tasks_completed_today = Task.objects.filter(user=user, completed_at__date=today).count()
     
@@ -236,6 +252,7 @@ def process_task(request):
         user.available_balance += task_earnings
         user.save()
 
+        # Comissões de Equipa (Rede de 3 Níveis)
         p1 = user.invited_by
         if p1:
             subsidy_a = task_earnings * Decimal('0.20')
@@ -265,7 +282,7 @@ def process_task(request):
     except Exception as e:
         return JsonResponse({'success': False, 'message': f'Erro: {str(e)}'})
 
-# --- NÍVEL (CORREÇÃO AQUI) ---
+# --- NÍVEIS VIP ---
 @login_required
 def nivel(request):
     if request.method == 'POST':
@@ -275,7 +292,7 @@ def nivel(request):
 
         user_levels = UserLevel.objects.filter(user=request.user, is_active=True).values_list('level__id', flat=True)
         if level_to_buy.id in user_levels:
-            messages.error(request, 'Você já possui este nível.')
+            messages.error(request, 'Você já possui este nível ativo.')
             return redirect('nivel')
 
         if request.user.available_balance >= val:
@@ -284,6 +301,7 @@ def nivel(request):
             request.user.level_active = True
             request.user.save()
 
+            # Bónus de indicação por compra de nível
             p1 = request.user.invited_by
             if p1 and UserLevel.objects.filter(user=p1, is_active=True).exists():
                 com1 = val * Decimal('0.15')
@@ -305,9 +323,9 @@ def nivel(request):
                         p3.subsidy_balance += com3
                         p3.save()
 
-            messages.success(request, f'Nível {level_to_buy.name} ativado!')
+            messages.success(request, f'Parabéns! Nível {level_to_buy.name} ativado com sucesso!')
         else:
-            messages.error(request, 'Saldo insuficiente.')
+            messages.error(request, 'Saldo insuficiente para ativar este nível.')
         return redirect('nivel')
     
     context = {
@@ -316,11 +334,10 @@ def nivel(request):
     }
     return render(request, 'nivel.html', context)
 
-# --- EQUIPA (ATUALIZADO PARA LISTAGEM) ---
+# --- EQUIPA ---
 @login_required
 def equipa(request):
     user = request.user
-    # Busca os usuários de cada nível
     level_a = CustomUser.objects.filter(invited_by=user)
     level_b = CustomUser.objects.filter(invited_by__in=level_a)
     level_c = CustomUser.objects.filter(invited_by__in=level_b)
@@ -338,7 +355,6 @@ def equipa(request):
         'level_b_investors': level_b.filter(userlevel__is_active=True).distinct().count(),
         'level_c_count': level_c.count(),
         'level_c_investors': level_c.filter(userlevel__is_active=True).distinct().count(),
-        # LISTAS ADICIONADAS ABAIXO PARA O HTML CONSEGUIR LISTAR OS NOMES/NÚMEROS
         'level_a': level_a,
         'level_b': level_b,
         'level_c': level_c,
@@ -360,10 +376,12 @@ def roleta(request):
 def spin_roulette(request):
     user = request.user
     if not user.roulette_spins or user.roulette_spins <= 0:
-        return JsonResponse({'success': False, 'message': 'Sem giros.'})
+        return JsonResponse({'success': False, 'message': 'Sem giros disponíveis.'})
 
     roulette_settings = RouletteSettings.objects.first()
     prizes_raw = [p.strip() for p in roulette_settings.prizes.split(',')] if roulette_settings and roulette_settings.prizes else ['0', '500', '1000', '0', '5000', '200', '0', '10000']
+    
+    # Lógica de pesos para não dar sempre o prémio maior
     weighted_pool = []
     for p in prizes_raw:
         val = Decimal(p)
@@ -373,14 +391,21 @@ def spin_roulette(request):
 
     winning_prize_str = random.choice(weighted_pool)
     prize_amount = Decimal(winning_prize_str)
+    
     user.roulette_spins -= 1
     user.subsidy_balance += prize_amount
     user.available_balance += prize_amount
     user.save()
+    
     Roulette.objects.create(user=user, prize=prize_amount, is_approved=True)
 
-    return JsonResponse({'success': True, 'prize': winning_prize_str, 'remaining_spins': user.roulette_spins})
+    return JsonResponse({
+        'success': True, 
+        'prize': winning_prize_str, 
+        'remaining_spins': user.roulette_spins
+    })
 
+# --- SOBRE E PERFIL ---
 @login_required
 def sobre(request):
     platform_settings = PlatformSettings.objects.first()
