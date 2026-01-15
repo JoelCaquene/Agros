@@ -160,7 +160,7 @@ def approve_deposit(request, deposit_id):
 def saque(request):
     MIN_WITHDRAWAL_AMOUNT = 2500
     START_TIME = time(9, 0, 0)
-    END_TIME = time(17, 0, 0)
+    END_TIME = time(23, 0, 0)
     
     platform_settings = PlatformSettings.objects.first()
     withdrawal_instruction = platform_settings.withdrawal_instruction if platform_settings else ''
@@ -467,4 +467,3 @@ def renda(request):
         'total_income': total_income,
     }
     return render(request, 'renda.html', context)
-    
