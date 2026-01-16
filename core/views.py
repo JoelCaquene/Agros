@@ -201,8 +201,6 @@ def saque(request):
                 elif metodo == 'USDT':
                     detalhes += f"Carteira: {usdt_addr}"
 
-                # CORREÇÃO AQUI: Usando o nome correto 'withdrawal_details' que está no seu models.py
-                # E também o campo 'method'
                 Withdrawal.objects.create(
                     user=request.user, 
                     amount=amount,
@@ -267,7 +265,7 @@ def process_task(request):
         user.save()
 
         p1 = user.invited_by
-        if p1:
+        if active_user_level and p1: # Verificação para remover comissão do Plano 0
             subsidy_a = task_earnings * Decimal('0.20')
             p1.available_balance += subsidy_a
             p1.subsidy_balance += subsidy_a
@@ -342,7 +340,6 @@ def nivel(request):
     
     context = {
         'levels': Level.objects.all().order_by('deposit_value'),
-        # CORREÇÃO: Adicionado 'user=' antes de request.user para evitar erro de iteração
         'user_levels': UserLevel.objects.filter(user=request.user, is_active=True).values_list('level__id', flat=True),
     }
     return render(request, 'nivel.html', context)
