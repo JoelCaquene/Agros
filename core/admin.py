@@ -9,12 +9,10 @@ from .models import (
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
-    # ADICIONADO: 'free_days_count' para você controlar quantos dias o estagiário já usou
     list_display = ('phone_number', 'available_balance', 'free_days_count', 'is_staff', 'is_active', 'date_joined')
     search_fields = ('phone_number', 'invite_code')
     list_filter = ('is_staff', 'is_active', 'level_active')
     ordering = ('-date_joined',)
-    # Permite editar o contador de dias grátis direto na lista se precisar dar bônus
     list_editable = ('free_days_count',)
 
 # --- CONFIGURAÇÕES DE DEPÓSITO ---
@@ -55,11 +53,12 @@ class DepositAdmin(admin.ModelAdmin):
         return "Nenhum Comprovativo Carregado"
     current_proof_display.short_description = 'Foto do Comprovativo'
 
-# --- CONFIGURAÇÕES DE SAQUE ---
+# --- CONFIGURAÇÕES DE SAQUE (AQUI ESTÁ A MUDANÇA!) ---
 
 @admin.register(Withdrawal)
 class WithdrawalAdmin(admin.ModelAdmin):
-    list_display = ('user', 'amount', 'method', 'status', 'created_at')
+    # ADICIONADO: 'dados_bancarios_cliente' para aparecer na lista principal
+    list_display = ('user', 'amount', 'status', 'dados_bancarios_cliente', 'created_at')
     search_fields = ('user__phone_number', 'withdrawal_details')
     list_filter = ('status', 'method', 'created_at')
     list_editable = ('status',)
@@ -69,14 +68,37 @@ class WithdrawalAdmin(admin.ModelAdmin):
             'fields': ('user', 'amount', 'status')
         }),
         ('Dados para Pagamento', {
-            'fields': ('method', 'withdrawal_details'),
-            'description': 'Estes são os dados fornecidos pelo cliente para o recebimento.'
+            'fields': ('method', 'withdrawal_details', 'dados_completos_perfil'),
         }),
         ('Datas', {
             'fields': ('created_at',),
         }),
     )
-    readonly_fields = ('created_at',)
+    # Criamos um campo de leitura para mostrar os dados do perfil do usuário
+    readonly_fields = ('created_at', 'dados_completos_perfil')
+
+    def dados_bancarios_cliente(self, obj):
+        # Tenta buscar o IBAN do modelo BankDetails ligado ao usuário
+        try:
+            return obj.user.bank_details.IBAN
+        except:
+            return mark_safe('<span style="color: red;">Não cadastrado</span>')
+    dados_bancarios_cliente.short_description = 'IBAN (Perfil)'
+
+    def dados_completos_perfil(self, obj):
+        # Mostra todos os dados do banco dentro do formulário de edição
+        try:
+            dados = obj.user.bank_details
+            return mark_safe(f"""
+                <div style="background: #f8f9fa; padding: 10px; border: 1px solid #ccc;">
+                    <strong>Banco:</strong> {dados.bank_name}<br>
+                    <strong>IBAN:</strong> {dados.IBAN}<br>
+                    <strong>Titular:</strong> {dados.account_holder_name}
+                </div>
+            """)
+        except:
+            return "O cliente ainda não preencheu os dados bancários no perfil."
+    dados_completos_perfil.short_description = 'Dados Bancários no Perfil'
 
 # --- NÍVEIS E PLATAFORMA ---
 
@@ -98,7 +120,6 @@ class PlatformBankDetailsAdmin(admin.ModelAdmin):
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    # ADICIONADO: 'task_day' para você ver exatamente a data da tarefa no painel
     list_display = ('user', 'earnings', 'task_day', 'completed_at')
     search_fields = ('user__phone_number',)
     list_filter = ('task_day', 'completed_at')
@@ -122,6 +143,6 @@ class RouletteSettingsAdmin(admin.ModelAdmin):
 
 @admin.register(BankDetails)
 class BankDetailsAdmin(admin.ModelAdmin):
-    list_display = ('user', 'bank_name', 'account_holder_name')
-    search_fields = ('user__phone_number', 'bank_name')
+    list_display = ('user', 'bank_name', 'account_holder_name', 'IBAN')
+    search_fields = ('user__phone_number', 'bank_name', 'IBAN')
     

@@ -13,19 +13,19 @@
         <div style="width: 80px;"></div>
     </div>
 
-    {# RESUMO DA EQUIPA #}
+{# RESUMO DA EQUIPA #}
     <div class="indicators-grid glass-effect">
         <div class="indicator-sq">
             <span class="ind-label">TOTAL MEMBROS</span>
-            <span class="ind-value">{{ team_count }}</span>
+            <span class="ind-value">{{ level_a_count }}</span>
         </div>
         <div class="indicator-sq">
             <span class="ind-label">INVESTIDORES</span>
-            <span class="ind-value">{{ total_investors }}</span>
+            <span class="ind-value">{{ level_a_investors }}</span>
         </div>
         <div class="indicator-sq">
             <span class="ind-label">MINHA COMISSÃO</span>
-            <span class="ind-value">KZ {{ user.subsidy_balance|default:"0.00" }}</span>
+            <span class="ind-value">KZ {{ user.subsidy_balance|default:"0,00" }}</span>
         </div>
     </div>
 
