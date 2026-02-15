@@ -507,7 +507,7 @@ def perfil(request):
         'bank_info': bank_details,
         'user_levels': UserLevel.objects.filter(user=user, is_active=True),
         'daily_income': daily_income,       # Agora o template vai receber o valor correto
-        'total_withdrawals': total_withdrawals, # Agora o template vai receber o valor correto em conforme
+        'total_withdrawals': total_withdrawals, # Agora o template vai receber o valor correto
     }
     return render(request, 'perfil.html', context)
 
