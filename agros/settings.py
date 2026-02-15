@@ -30,7 +30,12 @@ if RENDER_EXTERNAL_HOSTNAME:
         ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # ADICIONADO: Seus domínios personalizados para produção
-ALLOWED_HOSTS.extend([])
+ALLOWED_HOSTS.extend([
+    'www.agross.team',            # Seu domínio principal (com www)
+    'agross.team',                # Seu domínio raiz (sem www)
+    'agros-ldkh.onrender.com',    # Endereço padrão do Render
+    '127.0.0.1',                  # Localhost para testes
+])
 
 # Configuração de origens confiáveis para CSRF
 CSRF_TRUSTED_ORIGINS = [f"https://{host.strip()}" for host in ALLOWED_HOSTS if host.strip()]
