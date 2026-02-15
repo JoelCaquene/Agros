@@ -30,8 +30,7 @@ if RENDER_EXTERNAL_HOSTNAME:
         ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # ADICIONADO: Seus domínios personalizados para produção
-ALLOWED_HOSTS.extend([*
-])
+ALLOWED_HOSTS.extend([])
 
 # Configuração de origens confiáveis para CSRF
 CSRF_TRUSTED_ORIGINS = [f"https://{host.strip()}" for host in ALLOWED_HOSTS if host.strip()]
