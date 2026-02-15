@@ -8,22 +8,90 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-{# 1. POP-UP DE BOAS-VINDAS - VERSÃO CORRIGIDA #}
+{# 1. POP-UP DE BOAS-VINDAS PERSONALIZADO #}
+<style>
+    /* Estilização rápida para garantir o visual bonito */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal-content-white {
+        background: #fff;
+        padding: 25px;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 320px; /* Tamanho pequeno e elegante */
+        text-align: center;
+        position: relative;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .modal-logo-blue {
+        color: #007bff;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-transform: lowercase;
+    }
+
+    .modal-text {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 20px;
+        line-height: 1.4;
+    }
+
+    .btn-whatsapp-new {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        color: white;
+        text-decoration: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: transform 0.2s;
+    }
+
+    .btn-whatsapp-new:hover {
+        transform: scale(1.03);
+    }
+
+    .btn-x-close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #999;
+    }
+</style>
+
 <div id="welcomeModal" class="modal-overlay">
-    <div class="modal-card-fixed">
-        <button class="modal-close-simple" onclick="closeModal()">×</button>
+    <div class="modal-content-white animate-in">
+        <button class="btn-x-close" onclick="closeModal()">×</button>
         
-        <div class="modal-content-area">
-            <div class="brand-tag">AGROS</div>
-            <h2 class="modal-h2">Comunidade Oficial</h2>
-            <p class="modal-p">Possuímos um grupo de discussão exclusivo. Participe para receber novidades e suporte em tempo real.</p>
+        <div class="modal-body-clean">
+            <h2 class="modal-logo-blue">agros</h2>
+            <p class="modal-text">Acesse a comunidade, para suporte geral:</p>
             
-            <a href="{{ whatsapp_link }}" target="_blank" class="btn-wa-modern">
+            <a href="{{ whatsapp_link }}" target="_blank" class="btn-whatsapp-new">
                 <i class="fab fa-whatsapp"></i>
-                <span>ACESSAR GRUPO AGORA</span>
+                <span>GRUPO WHATSAPP</span>
             </a>
-            
-            <div class="modal-footer-text">Agros Team • 2026</div>
         </div>
     </div>
 </div>
