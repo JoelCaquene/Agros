@@ -8,19 +8,22 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-{# 1. POP-UP DE BOAS-VINDAS #}
+{# 1. POP-UP DE BOAS-VINDAS PERSONALIZADO #}
 <div id="welcomeModal" class="modal-overlay">
-    <div class="modal-content-white animate-in">
-        <div class="modal-header-img">
-            <button class="btn-x-close" onclick="closeModal()">×</button>
-            <img src="{% static 'images/banner_agro.jpg' %}" alt="Agros Top" style="width: 100%; height: 120px; object-fit: cover;">
-        </div>
-        <div class="modal-body-clean">
-            <h2 class="modal-logo-blue">agros</h2>
-            <a href="{{ whatsapp_link }}" target="_blank" class="btn-whatsapp-new">
+    <div class="modal-card animate-pop">
+        <button class="modal-close-icon" onclick="closeModal()">×</button>
+        
+        <div class="modal-inner">
+            <div class="brand-badge">agros</div>
+            <h2 class="modal-title">Comunidade Oficial</h2>
+            <p class="modal-text">Possuímos um grupo de discussão exclusivo. Participe para receber novidades e suporte.</p>
+            
+            <a href="{{ whatsapp_link }}" target="_blank" class="btn-premium-wa">
                 <i class="fab fa-whatsapp"></i>
-                <span>GRUPO WHATSAPP</span>
+                <span>ACESSAR GRUPO</span>
             </a>
+            
+            <span class="modal-footer-note">Agros Team • 2026</span>
         </div>
     </div>
 </div>
