@@ -10,7 +10,6 @@
 
 {# 1. POP-UP DE BOAS-VINDAS PERSONALIZADO #}
 <style>
-    /* Estilização rápida para garantir o visual bonito */
     .modal-overlay {
         position: fixed;
         top: 0;
@@ -29,7 +28,7 @@
         padding: 25px;
         border-radius: 15px;
         width: 90%;
-        max-width: 320px; /* Tamanho pequeno e elegante */
+        max-width: 320px;
         text-align: center;
         position: relative;
         box-shadow: 0 10px 25px rgba(0,0,0,0.2);
@@ -83,11 +82,9 @@
 <div id="welcomeModal" class="modal-overlay">
     <div class="modal-content-white animate-in">
         <button class="btn-x-close" onclick="closeModal()">×</button>
-        
         <div class="modal-body-clean">
             <h2 class="modal-logo-blue">agros</h2>
             <p class="modal-text">Acesse a comunidade, para suporte geral:</p>
-            
             <a href="{{ whatsapp_link }}" target="_blank" class="btn-whatsapp-new">
                 <i class="fab fa-whatsapp"></i>
                 <span>GRUPO WHATSAPP</span>
@@ -98,14 +95,14 @@
 
 <div class="forex-dashboard">
     
-    {# 2. TOPO COM NOME ANIMADO E BRILHO DOURADO #}
+    {# 2. TOPO COM NOME ANIMADO #}
     <div class="top-header-clean">
         <div class="anim-container">
             <h1 class="moving-name">agros</h1>
         </div>
     </div>
 
-    {# 3. CARROSSEL DE IMAGENS (REDUZIDO ESPAÇAMENTO) #}
+    {# 3. CARROSSEL DE IMAGENS #}
     <div class="swiper main-carousel">
         <div class="swiper-wrapper">
             <div class="swiper-slide"><img src="{% static 'images/slide1.jpg' %}" alt="Slide 1"></div>
@@ -141,7 +138,7 @@
         </div>
     </div>
 
-    {# 5. ROLETA COM FOGOS DE ARTIFÍCIO #}
+    {# 5. ROLETA #}
     <div class="roleta-container">
         <a href="{% url 'roleta' %}" class="roleta-glow-link">
             <div class="roleta-spin-wrapper" id="roletaWrapper">
@@ -149,6 +146,35 @@
                 <div class="roleta-center-text">SORTEIO</div>
             </div>
         </a>
+    </div>
+
+    {# 6. SEÇÃO HISTÓRIA E CONQUISTAS AGROS (ADICIONADO) #}
+    <div class="history-section">
+        <h3 class="section-title">Nossa Trajetória</h3>
+        
+        <div class="history-card">
+            <div class="card-icon"><i class="fas fa-seedling"></i></div>
+            <h4>Fundação e Propósito (1949)</h4>
+            <p>A AGROS nasceu no Norte de Portugal com a missão de unir produtores de leite para modernizar o campo e garantir a qualidade que hoje é referência em toda a Europa.</p>
+        </div>
+
+        <div class="history-card">
+            <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+            <h4>Crescimento e Modernização</h4>
+            <p>Nos anos 80, expandiu-se para Trás-os-Montes, tornando-se uma potência industrial e obtendo autorização oficial para levar o leite pasteurizado direto ao consumidor.</p>
+        </div>
+
+        <div class="history-card highlight">
+            <div class="card-icon"><i class="fas fa-trophy"></i></div>
+            <h4>A Revolução Lactogal (1996)</h4>
+            <p>Marco histórico: a AGROS fundou a Lactogal, tornando-se a maior empresa de laticínios da Península Ibérica, detentora de marcas globais como a Mimosa.</p>
+        </div>
+
+        <div class="history-card">
+            <div class="card-icon"><i class="fas fa-award"></i></div>
+            <h4>Liderança e Sustentabilidade</h4>
+            <p>Com 75 anos de história, a AGROS hoje lidera o setor com foco total em bem-estar animal, inovação laboratorial e redução da pegada de carbono.</p>
+        </div>
     </div>
 
 </div>
@@ -168,9 +194,8 @@
         overflow-x: hidden;
     }
 
-    .forex-dashboard { width: 100%; max-width: 500px; margin: 0 auto; padding-top: 5px; }
+    .forex-dashboard { width: 100%; max-width: 500px; margin: 0 auto; padding-top: 5px; padding-bottom: 50px; }
 
-    /* NOME ANIMADO COM SOMBRA DOURADA */
     .top-header-clean { padding: 5px 15px; height: 40px; position: relative; }
     .anim-container { position: relative; width: 100%; height: 100%; }
     .moving-name {
@@ -186,11 +211,9 @@
         to { left: calc(100% - 85px); transform: scale(1.1); }
     }
 
-    /* CARROSSEL AJUSTADO PARA CIMA */
     .main-carousel { width: 95%; height: 170px; border-radius: 15px; margin: 0 auto 10px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
     .main-carousel img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* PAINEL PRETO LIMITADO */
     .black-panel-container {
         background: #111111;
         margin: 0 10px;
@@ -204,7 +227,6 @@
     }
     .action-item-new { display: flex; flex-direction: column; align-items: center; text-decoration: none; }
     
-    /* BOTÕES CINZA BRILHANTE */
     .icon-box-shiny {
         width: 50px; height: 50px;
         background: var(--shiny-gray);
@@ -217,7 +239,6 @@
     }
     .action-item-new span { font-size: 8px; font-weight: 800; color: #eee; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* ROLETA E FOGOS */
     .roleta-container { display: flex; justify-content: center; padding: 20px 0; position: relative; }
     .roleta-spin-wrapper {
         position: relative; width: 220px; height: 220px;
@@ -233,48 +254,54 @@
     }
     @keyframes rotateFull { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
+    /* ESTILO DOS CARDS DE HISTÓRIA */
+    .history-section { padding: 15px; }
+    .section-title { color: var(--blue-agros); font-weight: 900; text-align: center; margin-bottom: 20px; text-transform: uppercase; font-size: 18px; border-bottom: 2px solid #ffd700; display: inline-block; width: 100%; padding-bottom: 5px; }
+    
+    .history-card {
+        background: #fdfdfd;
+        border-radius: 15px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border-left: 5px solid var(--blue-agros);
+        transition: 0.3s;
+    }
+    .history-card.highlight { border-left-color: #ffd700; background: #fffcf0; }
+    .history-card h4 { margin: 0 0 8px 0; color: var(--blue-agros); font-size: 15px; font-weight: 700; }
+    .history-card p { margin: 0; color: #555; font-size: 13px; line-height: 1.5; }
+    .card-icon { font-size: 20px; color: var(--blue-agros); margin-bottom: 5px; }
+
     /* MODAL */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(5px); }
     .modal-content-white { width: 300px; background: #fff; border-radius: 25px; overflow: hidden; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     .btn-x-close { position: absolute; top: 10px; right: 15px; background: rgba(0,0,0,0.5); border: none; font-size: 20px; color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; z-index: 11; }
-    .modal-logo-blue { color: var(--blue-agros); font-weight: 900; margin: 15px 0; }
-    .btn-whatsapp-new { background: #25d366; color: #fff; text-decoration: none; margin: 0 20px 20px; padding: 12px; border-radius: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 <script>
-    // Inicializar Carrossel
     const swiper = new Swiper('.main-carousel', {
         loop: true,
         autoplay: { delay: 5000, disableOnInteraction: false },
         pagination: { el: '.swiper-pagination', clickable: true },
     });
 
-    // Função para Fogos de Artifício contínuos na roleta
     function launchFireworks() {
         const duration = 15 * 1000;
         const animationEnd = Date.now() + duration;
         const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-        function randomInRange(min, max) {
-          return Math.random() * (max - min) + min;
-        }
-
+        function randomInRange(min, max) { return Math.random() * (max - min) + min; }
         const interval = setInterval(function() {
           const timeLeft = animationEnd - Date.now();
           if (timeLeft <= 0) return clearInterval(interval);
-
           const particleCount = 20 * (timeLeft / duration);
-          // Soltar das laterais da roleta
           confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
           confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
         }, 2000);
     }
 
-    // Iniciar fogos ao carregar
     window.onload = () => {
         launchFireworks();
-        // Repetir fogos periodicamente
         setInterval(launchFireworks, 16000);
     };
 
