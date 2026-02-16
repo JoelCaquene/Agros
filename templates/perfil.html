@@ -1,253 +1,322 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Editar IBAN - Angowork{% endblock %}
+{% block title %}Perfil - agros{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
     :root {
-        --primary-gold: #f1c40f;
-        --dark-card: rgba(10, 15, 25, 0.95);
-        --input-bg: rgba(255, 255, 255, 0.07);
-        --success-green: #2ecc71;
+        --primary-blue: #003366;
+        --accent-red: #ff0000;
+        --bg-light: #ffffff;
+        --text-dark: #333333;
+        --border-color: #f0f0f0;
+        --indicator-bg: #f8f9fa;
     }
 
-    /* Reset para evitar rolagem horizontal e "balanço" */
+    /* Trava de layout para não balançar */
     html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        overflow-x: hidden; /* Trava rolagem lateral */
-        background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url("{% static 'background_cad.jpg' %}") no-repeat center center fixed;
-        background-size: cover;
+        margin: 0; padding: 0;
+        width: 100%; min-height: 100vh;
+        background: var(--bg-light);
         font-family: 'Poppins', sans-serif;
-        color: white;
+        color: var(--text-dark);
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
     }
 
-    .profile-container {
+    .meus-container {
         width: 100%;
-        max-width: 400px; /* Ajuste para ecrãs menores */
+        max-width: 500px;
         margin: 0 auto;
-        padding: 15px;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        padding-bottom: 80px;
         box-sizing: border-box;
     }
 
-    .header-minimal {
-        text-align: center;
-        margin-bottom: 25px;
-    }
-
-    .header-minimal i {
-        font-size: 2.5rem;
-        color: var(--primary-gold);
-        margin-bottom: 8px;
-    }
-
-    /* CARD PRINCIPAL */
-    .iban-card {
-        background: var(--dark-card);
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 25px;
-        border-radius: 25px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    /* ESTILO DO RESUMO (DADOS SALVOS) */
-    .data-summary {
-        text-align: center;
-    }
-
-    .summary-item {
-        margin-bottom: 15px;
-        padding: 10px;
-        background: rgba(255,255,255,0.03);
-        border-radius: 12px;
-    }
-
-    .summary-label {
-        display: block;
-        font-size: 0.65rem;
-        color: var(--primary-gold);
-        text-transform: uppercase;
-        margin-bottom: 4px;
-    }
-
-    .summary-value {
-        font-size: 0.95rem;
-        font-weight: 600;
-        word-break: break-all; /* Evita que IBAN longo quebre o layout */
-    }
-
-    /* FORMULÁRIO (ESCONDIDO POR PADRÃO VIA JS SE HOUVER DADOS) */
-    #ibanForm {
-        display: none; 
-    }
-
-    .form-group { margin-bottom: 18px; }
-    .form-group label {
-        display: block;
-        font-size: 0.7rem;
-        color: var(--primary-gold);
-        margin-bottom: 6px;
-        text-transform: uppercase;
-    }
-
-    .input-wrapper { position: relative; display: flex; align-items: center; }
-    .input-wrapper i { position: absolute; left: 15px; color: #777; }
-
-    .input-wrapper input {
-        width: 100%;
-        padding: 14px 14px 14px 45px;
-        background: var(--input-bg);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 12px;
-        color: white;
-        font-size: 0.9rem;
-        outline: none;
-        box-sizing: border-box;
-    }
-
-    /* BOTÕES */
-    .btn-action {
-        width: 100%;
-        padding: 15px;
-        border: none;
-        border-radius: 12px;
-        font-weight: 700;
-        cursor: pointer;
+    /* TOPO COM AVATAR E ID */
+    .profile-header {
         display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 10px;
-        transition: 0.3s;
-        text-transform: uppercase;
-        font-size: 0.85rem;
+        padding: 20px;
+        gap: 15px;
     }
 
-    .save-btn { background: var(--success-green); color: white; margin-top: 10px; }
-    .edit-btn { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); margin-top: 15px; }
+    .btn-back-circle {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        background: var(--indicator-bg);
+        display: flex; align-items: center; justify-content: center;
+        color: var(--primary-blue); text-decoration: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
 
-    .btn-return { margin-top: 20px; text-align: center; }
-    .btn-return a { color: #aaa; text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .user-avatar {
+        width: 55px; height: 55px;
+        border-radius: 50%;
+        background: var(--primary-blue);
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 1.5rem;
+        border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .user-info-text {
+        display: flex; flex-direction: column;
+    }
+
+    .user-info-text .id-label {
+        font-size: 0.7rem; color: #888; font-weight: 600; text-transform: uppercase;
+    }
+
+    .user-info-text .id-number {
+        font-size: 1.1rem; font-weight: 800; color: var(--primary-blue);
+    }
+
+    .brand-title {
+        margin-left: auto;
+        font-size: 1.5rem; font-weight: 900; color: var(--accent-red);
+        letter-spacing: 1px;
+    }
+
+    /* GRADE DE INDICADORES */
+    .indicators-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        padding: 0 15px 20px 15px;
+    }
+
+    .ind-card {
+        background: var(--indicator-bg);
+        border-radius: 12px;
+        padding: 12px 5px;
+        display: flex; flex-direction: column;
+        align-items: center; text-align: center;
+        border: 1px solid var(--border-color);
+    }
+
+    .ind-card i { font-size: 1.1rem; color: var(--primary-blue); margin-bottom: 4px; }
+    .ind-card .ind-label { font-size: 0.55rem; font-weight: 700; color: #999; text-transform: uppercase; }
+    .ind-card .ind-value { font-size: 0.7rem; font-weight: 800; color: var(--primary-blue); margin-top: 2px; }
+
+    /* LISTA DE AÇÕES */
+    .actions-list {
+        padding: 0 20px;
+        display: flex; flex-direction: column;
+        gap: 10px;
+    }
+
+    .action-row {
+        display: flex; align-items: center;
+        padding: 16px;
+        background: #fff;
+        border: 1.5px solid var(--border-color);
+        border-radius: 16px;
+        text-decoration: none;
+        color: var(--primary-blue);
+        font-weight: 700; font-size: 0.9rem;
+        transition: 0.2s;
+    }
+
+    .action-row i:first-child {
+        width: 30px; font-size: 1.2rem;
+    }
+
+    .arrow-right { margin-left: auto; font-size: 0.7rem; color: #ddd; }
+
+    /* SEÇÃO BANCO ESCONDIDA */
+    .bank-drawer {
+        display: none;
+        margin-top: 5px;
+        padding: 20px;
+        background: #fcfcfc;
+        border-radius: 16px;
+        border: 1px dashed #ccc;
+    }
+
+    .form-group { margin-bottom: 12px; }
+    .form-group label { font-size: 0.7rem; font-weight: 800; color: #777; margin-bottom: 5px; display: block; }
+    
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+    .input-wrapper i { position: absolute; left: 15px; color: #444; font-size: 1rem; }
+    .input-wrapper input {
+        width: 100%; padding: 14px 15px 14px 45px;
+        border: 1px solid #ddd; border-radius: 10px;
+        font-size: 0.9rem; outline: none; background: #fff;
+    }
+
+    .btn-confirm {
+        width: 100%; padding: 15px;
+        background: var(--primary-blue); color: #fff;
+        border: none; border-radius: 10px; font-weight: 700; cursor: pointer;
+    }
+
+    .summary-box {
+        padding: 10px; background: #f0f7ff; border-radius: 10px; margin-bottom: 15px;
+    }
+    .summary-box p { margin: 4px 0; font-size: 0.8rem; color: #444; }
 
     /* MENSAGEM SUCESSO */
-    .alert-success {
-        background: rgba(46, 204, 113, 0.2);
-        border: 1px solid var(--success-green);
-        color: var(--success-green);
-        padding: 12px;
-        border-radius: 12px;
-        font-size: 0.8rem;
-        text-align: center;
-        margin-bottom: 15px;
+    .msg-pop {
+        margin: 10px 20px; padding: 10px;
+        background: #d4edda; color: #155724;
+        border-radius: 8px; font-size: 0.8rem; text-align: center;
     }
 </style>
 
-<div class="profile-container">
-    <div class="header-minimal">
-        <i class="fas fa-shield-halved"></i>
-        <h1>Dados Bancários</h1>
-        <p>Segurança Angowork</p>
+<div class="meus-container">
+
+    <div class="profile-header">
+        <a href="{% url 'menu' %}" class="btn-back-circle">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        <div class="user-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <div class="user-info-text">
+            <span class="id-label">Meu ID</span>
+            <span class="id-number">{{ user.phone_number }}</span>
+        </div>
+        <div class="brand-title">MEUS</div>
     </div>
 
     {% if messages %}
         {% for message in messages %}
-            <div class="alert-success"><i class="fas fa-check-circle"></i> {{ message }}</div>
+            <div class="msg-pop"><i class="fas fa-check-circle"></i> {{ message }}</div>
         {% endfor %}
     {% endif %}
 
-    <div class="iban-card">
-        <div id="dataSummary" class="data-summary">
-            <div class="summary-item">
-                <span class="summary-label">Titular</span>
-                <span class="summary-value">{% if bank_info.account_holder_name %}{{ bank_info.account_holder_name }}{% else %}---{% endif %}</span>
+    <div class="indicators-grid">
+        <div class="ind-card">
+            <i class="fas fa-crown"></i>
+            <span class="ind-label">VIP</span>
+            <span class="ind-value">
+                {% if user_levels %}
+                    {% for ul in user_levels %}
+                        {{ ul.level.name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                {% else %}
+                    F0
+                {% endif %}
+            </span>
+        </div>
+        <div class="ind-card">
+            <i class="fas fa-wallet"></i>
+            <span class="ind-label">Saldo</span>
+            <span class="ind-value">KZ {{ user.available_balance|default:"0.00" }}</span>
+        </div>
+        <div class="ind-card">
+            <i class="fas fa-hand-holding-dollar"></i>
+            <span class="ind-label">Sacado</span>
+            <span class="ind-value">KZ {{ withdrawal_records.filter.status|default:"0" }}
+                {% with total_s=withdrawal_records.all %}
+                   {% if total_s %}
+                      {# A lógica de soma total geralmente é feita no view, mas aqui exibimos o indicador #}
+                   {% endif %}
+                {% endwith %}
+                {{ total_withdrawals|default:"0" }}
+            </span>
+        </div>
+        <div class="ind-card">
+            <i class="fas fa-coins"></i>
+            <span class="ind-label">Hoje</span>
+            <span class="ind-value">KZ {{ daily_income|default:"0.00" }}</span>
+        </div>
+    </div>
+
+    <div class="actions-list">
+        
+        <a href="javascript:void(0)" class="action-row" onclick="toggleBank()">
+            <i class="fas fa-university"></i>
+            <span>DADOS BANCÁRIOS</span>
+            <i class="fas fa-chevron-down arrow-right" id="bank-arrow"></i>
+        </a>
+
+        <div id="bankDrawer" class="bank-drawer">
+            {% if bank_info.IBAN %}
+            <div class="summary-box">
+                <p><strong><i class="far fa-user"></i> Titular:</strong> {{ bank_info.account_holder_name }}</p>
+                <p><strong><i class="far fa-building"></i> Banco:</strong> {{ bank_info.bank_name }}</p>
+                <p><strong><i class="fas fa-barcode"></i> IBAN:</strong> {{ bank_info.IBAN }}</p>
             </div>
-            <div class="summary-item">
-                <span class="summary-label">Banco</span>
-                <span class="summary-value">{% if bank_info.bank_name %}{{ bank_info.bank_name }}{% else %}---{% endif %}</span>
-            </div>
-            <div class="summary-item">
-                <span class="summary-label">IBAN</span>
-                <span class="summary-value">{% if bank_info.IBAN %}{{ bank_info.IBAN }}{% else %}---{% endif %}</span>
-            </div>
-            
-            <button class="btn-action edit-btn" onclick="toggleForm()">
-                <i class="fas fa-edit"></i> Editar Coordenadas
-            </button>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>NOME COMPLETO DO TITULAR</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-id-card-clip"></i>
+                        {{ form.account_holder_name }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>INSTITUIÇÃO BANCÁRIA</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-piggy-bank"></i>
+                        {{ form.bank_name }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>COORDENADA IBAN</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-key"></i>
+                        {{ form.IBAN }}
+                    </div>
+                </div>
+                <button type="submit" name="update_bank" class="btn-confirm">
+                    SALVAR DADOS BANCÁRIOS
+                </button>
+            </form>
         </div>
 
-        <form method="post" id="ibanForm">
-            {% csrf_token %}
-            <div class="form-group">
-                <label>Nome do Titular</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-user-circle"></i>
-                    {{ form.account_holder_name }}
-                </div>
-            </div>
+        <a href="{% static 'app/agros.apk' %}" download class="action-row">
+            <i class="fas fa-cloud-arrow-down"></i>
+            <span>DOWNLOAD APP</span>
+            <i class="fas fa-chevron-right arrow-right"></i>
+        </a>
 
-            <div class="form-group">
-                <label>Instituição</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-university"></i>
-                    {{ form.bank_name }}
-                </div>
-            </div>
+        <a href="{% url 'sobre' %}" class="action-row">
+            <i class="fas fa-book-open"></i>
+            <span>Instruções</span>
+            <i class="fas fa-chevron-right arrow-right"></i>
+        </a>
 
-            <div class="form-group">
-                <label>Número IBAN</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-fingerprint"></i>
-                    {{ form.IBAN }}
-                </div>
-            </div>
+        <a href="{% url 'equipa' %}" class="action-row">
+            <i class="fas fa-network-wired"></i>
+            <span>Equipa</span>
+            <i class="fas fa-chevron-right arrow-right"></i>
+        </a>
 
-            <button type="submit" name="update_bank" class="btn-action save-btn">
-                <i class="fas fa-check-double"></i> Confirmar Alteração
-            </button>
-            
-            <button type="button" class="btn-action edit-btn" style="border:none; background:none; font-size: 0.7rem;" onclick="toggleForm()">
-                Cancelar
-            </button>
-        </form>
-    </div>
+        <a href="{% url 'change_password' %}" class="action-row">
+            <i class="fas fa-shield-halved"></i>
+            <span>ALTERAR SENHA</span>
+            <i class="fas fa-chevron-right arrow-right"></i>
+        </a>
 
-    <div class="btn-return">
-        <a href="{% url 'menu' %}">
-            <i class="fas fa-arrow-left"></i> Voltar ao Painel
+        <a href="{% url 'logout' %}" class="action-row" style="color: var(--accent-red); margin-top: 10px; border-color: #ffe5e5;">
+            <i class="fas fa-power-off"></i>
+            <span>SAIR DA CONTA</span>
+            <i class="fas fa-chevron-right arrow-right"></i>
         </a>
     </div>
+
 </div>
 
 <script>
-    function toggleForm() {
-        const summary = document.getElementById('dataSummary');
-        const form = document.getElementById('ibanForm');
+    function toggleBank() {
+        const drawer = document.getElementById('bankDrawer');
+        const arrow = document.getElementById('bank-arrow');
         
-        if (form.style.display === 'none' || form.style.display === '') {
-            form.style.display = 'block';
-            summary.style.display = 'none';
+        if (drawer.style.display === 'block') {
+            drawer.style.display = 'none';
+            arrow.className = 'fas fa-chevron-down arrow-right';
         } else {
-            form.style.display = 'none';
-            summary.style.display = 'block';
+            drawer.style.display = 'block';
+            arrow.className = 'fas fa-chevron-up arrow-right';
+            drawer.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
-
-    // Garante que o layout não balance ao carregar
-    window.onload = function() {
-        const hasIban = "{{ bank_info.IBAN }}";
-        if (!hasIban || hasIban === "None") {
-            toggleForm(); // Se não tem dados, já abre o formulário
-        }
-    };
 </script>
 {% endblock %}

@@ -1,1 +1,1 @@
-web: gunicorn angowork.wsgi
+web: gunicorn agros.wsgi

@@ -3,182 +3,190 @@
 
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Poppins:wght@700;900&display=swap" rel="stylesheet">
 
 <div class="casino-main-wrapper">
-    <a href="{% url 'home' %}" class="btn-voltar-casino">
-        <i class="fas fa-arrow-left"></i> VOLTAR
-    </a>
+    <div id="win-overlay" class="win-modal-overlay">
+        <div class="win-modal-content">
+            <i class="fas fa-crown crown-icon"></i>
+            <h1>PARABÉNS!</h1>
+            <p>Você acaba de ganhar</p>
+            <div class="win-amount"><span id="modal-win-value">0</span> <small>KZ</small></div>
+            <button onclick="location.reload()" class="btn-collect">COLETAR PRÊMIO</button>
+        </div>
+    </div>
+
+    <div class="top-nav-bar">
+        <a href="{% url 'home' %}" class="btn-voltar-casino">
+            <i class="fas fa-arrow-left"></i> VOLTAR
+        </a>
+    </div>
 
     <div class="casino-bright-bg">
-        <div class="shine-effect"></div>
-        <div class="gold-dust"></div>
+        <div class="neon-grid"></div>
     </div>
     
-    <div class="container py-4 position-relative main-content">
-        <div class="text-center mb-4">
-            <h1 class="premium-title">SORTEIO DE ACTIVIDADE</h1>
-            
-            <div id="top-win-display" class="top-win-banner" style="display: none;">
-                <div class="win-glow-anim"></div>
-                <i class="fas fa-star"></i> GANHOU: <span id="win-value-text">0</span> KZ <i class="fas fa-star"></i>
-            </div>
+    <div class="container py-3 position-relative main-content">
+        <div class="text-center mb-3 header-section">
+            <h1 class="premium-title">ROLETA DA SORTE</h1>
+            <p class="subtitle-premium">Tente a sorte e multiplique ganhos!</p>
         </div>
 
         <div class="wheel-outer-container">
-            <div class="wheel-pointer"></div>
+            <div class="wheel-pointer">
+                <i class="fas fa-caret-down"></i>
+            </div>
             <div class="wheel-box" id="main-wheel-box">
                 <div class="led-ring" id="led-container"></div>
                 <div class="canvas-wrapper">
                     <canvas id="wheel-canvas" width="500" height="500"></canvas>
                 </div>
                 <div class="center-spin-anchor" id="spin-trigger">
-                    <div class="center-btn-body"><span>SORTE</span></div>
+                    <div class="center-btn-body">
+                        <span>GIRAR</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        {# REGISTO DE VENCEDORES COM SCROLL AUTOMÁTICO #}
-        <div class="winners-card mt-4">
-            <h4 class="card-title text-center"><i class="fas fa-trophy" style="color: #ffcc00;"></i> REGISTO DE VENCEDORES</h4>
-            <div class="ticker-container">
-                <div class="winners-ticker" id="winners-feed">
+        {# REGISTO DE VENCEDORES #}
+        <div class="winners-card mt-3">
+            <h4 class="card-title">
+                <span class="live-dot"></span> ÚLTIMOS PREMIADOS
+            </h4>
+            <div class="ticker-window">
+                <div class="winners-ticker-vertical" id="winners-feed">
                     {% for winner in recent_winners %}
                     <div class="winner-item-ticker">
-                        <span class="ticker-user">ID: ****{{ winner.user.phone_number|slice:"-4:" }}</span>
-                        <span class="ticker-action">ganhou</span>
-                        <span class="ticker-value">{{ winner.prize }} KZ</span>
+                        <span class="ticker-user"><i class="fas fa-user-circle"></i> ****{{ winner.user.phone_number|slice:"-4:" }}</span>
+                        <span class="ticker-value">+{{ winner.prize }} KZ</span>
                     </div>
                     {% endfor %}
-                    {# Duplicamos a lista para o efeito de scroll infinito ser suave #}
                     {% for winner in recent_winners %}
                     <div class="winner-item-ticker">
-                        <span class="ticker-user">ID: ****{{ winner.user.phone_number|slice:"-4:" }}</span>
-                        <span class="ticker-action">ganhou</span>
-                        <span class="ticker-value">{{ winner.prize }} KZ</span>
+                        <span class="ticker-user"><i class="fas fa-user-circle"></i> ****{{ winner.user.phone_number|slice:"-4:" }}</span>
+                        <span class="ticker-value">+{{ winner.prize }} KZ</span>
                     </div>
                     {% endfor %}
-                    {% if not recent_winners %}
-                    <div class="winner-item-ticker text-center w-100">Aguardando novos giros...</div>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<audio id="bg-music" loop preload="auto">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3" type="audio/mp3">
+</audio>
 <audio id="snd-spin" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
-<audio id="snd-win" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+<audio id="snd-win" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
 
 <style>
     :root {
-        --casino-gold: #ffd700;
+        --neon-purple: #bc13fe;
+        --neon-blue: #01ffff;
+        --casino-gold: #ffcf00;
+        --dark-bg: #0b0118;
     }
 
-    body, html { margin: 0; padding: 0; overflow-x: hidden; background: #220000; }
-    
-    .casino-main-wrapper {
-        min-height: 100vh;
-        font-family: 'Poppins', sans-serif;
+    body { background: var(--dark-bg); margin: 0; overflow-x: hidden; font-family: 'Poppins', sans-serif; color: white; }
+
+    /* BARRA DE NAVEGAÇÃO SUPERIOR */
+    .top-nav-bar {
+        width: 100%;
+        padding: 15px;
         position: relative;
+        z-index: 1000;
         display: flex;
-        flex-direction: column;
+        align-items: center;
     }
-
-    .casino-bright-bg {
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at center, #4e0000 0%, #1a0000 100%);
-        z-index: 0;
-    }
-
-    .shine-effect {
-        position: absolute;
-        width: 200%; height: 200%; top: -50%; left: -50%;
-        background: repeating-conic-gradient(from 0deg, rgba(255,215,0,0.05) 0deg 15deg, transparent 15deg 30deg);
-        animation: rotateShine 30s linear infinite;
-    }
-    @keyframes rotateShine { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
     .btn-voltar-casino {
-        position: absolute; top: 20px; left: 15px; z-index: 200;
-        background: rgba(255,255,255,0.1); color: #fff;
-        padding: 8px 15px; border-radius: 30px; border: 1px solid var(--casino-gold);
-        text-decoration: none; font-size: 11px; font-weight: bold;
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        border: 1px solid var(--neon-purple);
+        transition: 0.3s;
     }
 
-    .premium-title { 
-        font-weight: 900; font-size: 1.6rem; color: var(--casino-gold);
-        text-shadow: 0 0 15px rgba(255,215,0,0.5); margin-top: 45px;
-        text-transform: uppercase;
+    .btn-voltar-casino:hover { background: var(--neon-purple); color: white; }
+
+    /* ESPAÇAMENTO DO TÍTULO */
+    .header-section { margin-top: 10px; }
+
+    .casino-bright-bg {
+        position: fixed; inset: 0; z-index: -1;
+        background: radial-gradient(circle at center, #240046 0%, #0b0118 100%);
     }
 
-    .top-win-banner {
-        background: linear-gradient(180deg, #ffd700, #b8860b); color: #000;
-        display: inline-block; padding: 12px 30px;
-        border-radius: 10px; font-weight: 900; font-size: 1.4rem;
-        box-shadow: 0 0 30px #fff; margin-top: 10px; z-index: 10;
+    .neon-grid {
+        position: absolute; width: 100%; height: 100%;
+        background-image: linear-gradient(var(--neon-purple) 1px, transparent 1px), linear-gradient(90deg, var(--neon-purple) 1px, transparent 1px);
+        background-size: 40px 40px; opacity: 0.1;
     }
 
-    .wheel-outer-container { position: relative; width: 85vw; max-width: 340px; margin: 20px auto; }
+    /* ROLETA RESPONSIVA */
+    .wheel-outer-container { 
+        position: relative; 
+        width: 82vw; 
+        max-width: 360px; 
+        margin: 10px auto; 
+    }
     
-    .wheel-pointer {
-        position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-        width: 35px; height: 45px; background: #fff; z-index: 100;
-        clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-    }
-
     .wheel-box {
         position: relative; width: 100%; aspect-ratio: 1/1;
-        background: #000; border-radius: 50%; border: 8px solid var(--casino-gold);
+        border-radius: 50%; border: 6px solid #1a1a1a;
+        box-shadow: 0 0 25px var(--neon-purple);
+        background: #000;
     }
 
-    .wheel-box.winner-glow {
-        box-shadow: 0 0 60px 20px #fff;
-        transform: scale(1.02);
-    }
+    #wheel-canvas { width: 100%; height: 100%; display: block; }
 
-    #wheel-canvas { width: 100%; height: 100%; transition: transform 5.5s cubic-bezier(0.15, 0, 0.1, 1); }
+    .wheel-pointer {
+        position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+        z-index: 100; color: #fff; font-size: 35px; filter: drop-shadow(0 0 8px var(--neon-blue));
+    }
 
     .center-spin-anchor {
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        width: 65px; height: 65px; background: var(--casino-gold); border-radius: 50%; z-index: 110;
-        cursor: pointer;
+        width: 20%; height: 20%; background: #fff; border-radius: 50%;
+        border: 3px solid var(--casino-gold); cursor: pointer; z-index: 110;
+        box-shadow: 0 0 15px var(--casino-gold);
     }
 
-    .center-btn-body {
-        width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-        color: #000; font-weight: 900; font-size: 0.8rem;
+    .center-btn-body { height: 100%; display: flex; align-items: center; justify-content: center; color: #000; font-weight: 900; font-size: 3.5vw; }
+    @media (min-width: 768px) { .center-btn-body { font-size: 14px; } }
+
+    .premium-title { 
+        font-family: 'Black Ops One', cursive; font-size: 1.8rem;
+        background: linear-gradient(to bottom, #fff, var(--casino-gold));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
 
-    /* ESTILO DO REGISTO DE VENCEDORES (TICKER) */
     .winners-card { 
-        background: rgba(0,0,0,0.7); 
-        border: 1px solid var(--casino-gold); 
-        border-radius: 15px; padding: 12px; max-width: 380px; margin: auto;
-    }
-    .card-title { color: #fff; font-size: 13px; font-weight: bold; margin-bottom: 8px; }
-    
-    .ticker-container { height: 110px; overflow: hidden; position: relative; }
-    
-    .winners-ticker {
-        display: flex; flex-direction: column;
-        animation: scrollUp 10s linear infinite;
+        background: rgba(255,255,255,0.05); 
+        border: 1px solid var(--neon-purple); 
+        border-radius: 15px; padding: 10px;
+        max-width: 400px; margin: 0 auto;
     }
     
-    .winner-item-ticker { 
-        padding: 8px; border-bottom: 1px solid rgba(255,215,0,0.1); 
-        display: flex; justify-content: space-between; color: #fff; font-size: 0.85rem;
-    }
-    
-    .ticker-value { color: var(--casino-gold); font-weight: bold; }
-    .ticker-action { color: #aaa; font-style: italic; font-size: 0.75rem; }
+    .ticker-window { height: 100px; overflow: hidden; position: relative; }
+    .winners-ticker-vertical { display: flex; flex-direction: column; animation: scrollVertical 15s linear infinite; }
+    .winner-item-ticker { display: flex; justify-content: space-between; padding: 8px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; }
 
-    @keyframes scrollUp {
-        0% { transform: translateY(0); }
-        100% { transform: translateY(-50%); }
+    @keyframes scrollVertical { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
+
+    .win-modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+        z-index: 9999; display: none; align-items: center; justify-content: center; text-align: center;
     }
 
-    .led { position: absolute; width: 6px; height: 6px; background: #fff; border-radius: 50%; left: 50%; top: 2%; transform-origin: 50% 2000%; }
+    .win-amount { font-size: 3.5rem; font-weight: 900; color: var(--casino-gold); text-shadow: 0 0 20px var(--neon-blue); }
+    .btn-collect { background: var(--casino-gold); padding: 12px 30px; border-radius: 30px; border: none; font-weight: 900; margin-top: 20px; cursor: pointer; }
+    .led { position: absolute; width: 5px; height: 5px; background: #fff; border-radius: 50%; left: 50%; top: 2%; transform-origin: 50% 1900%; }
 </style>
 
 <script>
@@ -186,15 +194,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
     const spinTrigger = document.getElementById('spin-trigger');
+    const bgMusic = document.getElementById('bg-music');
     const sndSpin = document.getElementById('snd-spin');
     const sndWin = document.getElementById('snd-win');
-    const wheelBox = document.getElementById('main-wheel-box');
-    const topWinDisplay = document.getElementById('top-win-display');
-    const winValueText = document.getElementById('win-value-text');
+    const winOverlay = document.getElementById('win-overlay');
+    const modalWinValue = document.getElementById('modal-win-value');
+
+    document.body.addEventListener('click', () => {
+        bgMusic.volume = 0.2;
+        bgMusic.play().catch(()=>{});
+    }, { once: true });
 
     let prizes = {{ prizes_list|safe }};
-    const icons = ["💰", "⭐", "💎", "👑", "🔥", "✨", "🍀", "🎁"];
-    const segmentColors = ["#b71c1c", "#1a1a1a", "#b71c1c", "#1a1a1a", "#b71c1c", "#1a1a1a", "#b71c1c", "#1a1a1a"];
+    const segmentColors = ["#6a1b9a", "#1a1a1a", "#4a148c", "#1a1a1a", "#6a1b9a", "#1a1a1a", "#4a148c", "#1a1a1a"];
     const segments = prizes.length;
     const arc = (2 * Math.PI) / segments;
     let currentRotation = 0;
@@ -209,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.moveTo(250, 250);
             ctx.arc(250, 250, 245, angle, angle + arc);
             ctx.fill();
-            ctx.strokeStyle = "#ffd700";
+            ctx.strokeStyle = "#ffcf00";
             ctx.lineWidth = 2;
             ctx.stroke();
 
@@ -218,18 +230,14 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.rotate(angle + arc / 2);
             ctx.textAlign = "right";
             ctx.fillStyle = "#fff";
-            ctx.font = "900 22px Arial";
-            ctx.fillText(prizes[i], 210, 8);
-            ctx.font = "18px Arial";
-            ctx.fillText(icons[i % icons.length], 130, 8);
+            ctx.font = "bold 26px Poppins";
+            ctx.fillText(prizes[i], 220, 10);
             ctx.restore();
         }
     }
 
     function spin() {
         if (isSpinning) return;
-        wheelBox.classList.remove('winner-glow');
-        topWinDisplay.style.display = 'none';
         isSpinning = true;
         sndSpin.play().catch(()=>{});
 
@@ -241,23 +249,17 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if(data.success) {
                 const prizeIndex = prizes.indexOf(data.prize.toString());
-                const extraRounds = 360 * 10;
-                const segmentDeg = 360 / segments;
-                const stopAngle = extraRounds + (360 - (prizeIndex * segmentDeg)) - (segmentDeg / 2) - 90;
-
+                const stopAngle = (360 * 10) + (360 - (prizeIndex * (360 / segments))) - ((360 / segments) / 2) - 90;
                 currentRotation += stopAngle;
+                canvas.style.transition = "transform 6s cubic-bezier(0.15, 0, 0.1, 1)";
                 canvas.style.transform = `rotate(${currentRotation}deg)`;
 
                 setTimeout(() => {
                     isSpinning = false;
                     sndWin.play().catch(()=>{});
-                    wheelBox.classList.add('winner-glow');
-                    winValueText.innerText = data.prize;
-                    topWinDisplay.style.display = 'inline-block';
-
-                    // FIXA O RESULTADO POR 5 SEGUNDOS PARA PRINT
-                    setTimeout(() => { location.reload(); }, 5000);
-                }, 5800);
+                    modalWinValue.innerText = data.prize;
+                    winOverlay.style.display = 'flex';
+                }, 6200);
             } else {
                 alert(data.message);
                 isSpinning = false;
@@ -267,10 +269,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createLeds() {
         const container = document.getElementById('led-container');
-        for (let i = 0; i < 30; i++) {
+        for (let i = 0; i < 20; i++) {
             const led = document.createElement('div');
             led.className = 'led';
-            led.style.transform = `rotate(${i * 12}deg) translateY(-242px)`;
+            led.style.transform = `rotate(${i * 18}deg) translateY(-235px)`;
             container.appendChild(led);
         }
     }

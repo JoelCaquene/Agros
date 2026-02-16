@@ -318,7 +318,7 @@ def process_task(request):
                     'message': 'Seu período de estagiário terminou. Adquira um plano pago para continuar.'
                 })
             
-            task_earnings = Decimal('450.00') # Ganho de estagiário
+            task_earnings = Decimal('500.00') # Ganho de estagiário
             user.free_days_count += 1
 
         # Salva a tarefa e atualiza saldo
@@ -486,8 +486,13 @@ def sobre(request):
 
 @login_required
 def perfil(request):
-    bank_details, created = BankDetails.objects.get_or_create(user=request.user)
-    withdrawal_records = Withdrawal.objects.filter(user=request.user).order_by('-created_at')
+    user = request.user
+    bank_details, created = BankDetails.objects.get_or_create(user=user)
+    
+    # LÓGICA PARA OS INDICADORES (IGUAL À FUNÇÃO RENDA)
+    today = date.today()
+    daily_income = Task.objects.filter(user=user, completed_at__date=today).aggregate(Sum('earnings'))['earnings__sum'] or 0
+    total_withdrawals = Withdrawal.objects.filter(user=user, status='Aprovado').aggregate(Sum('amount'))['amount__sum'] or 0
     
     if request.method == 'POST':
         if 'update_bank' in request.POST:
@@ -500,8 +505,9 @@ def perfil(request):
     context = {
         'form': BankDetailsForm(instance=bank_details),
         'bank_info': bank_details,
-        'user_levels': UserLevel.objects.filter(user=request.user, is_active=True),
-        'withdrawal_records': withdrawal_records,
+        'user_levels': UserLevel.objects.filter(user=user, is_active=True),
+        'daily_income': daily_income,       # Agora o template vai receber o valor correto
+        'total_withdrawals': total_withdrawals, # Agora o template vai receber o valor correto
     }
     return render(request, 'perfil.html', context)
 

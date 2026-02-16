@@ -1,274 +1,196 @@
 {% load static %}
-{% load i18n %} <!DOCTYPE html>
+{% load i18n %} 
+<!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>angowork - {% trans "Login" %}</title>
+    <title>agros - {% trans "Login" %}</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
     <style>
-        :root {
-            --primary-blue: #0055a4;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.3);
+        :root { 
+            --primary-blue: #003366; 
+            --input-border: #d1d5db;
+            --input-focus: #0066cc;
         }
 
         * { box-sizing: border-box; }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("{% static 'background_cad.jpg' %}") no-repeat center center fixed;
-            background-size: cover;
-            color: #fff;
-            overflow-x: hidden;
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            margin: 0; padding: 0; 
+            display: flex; flex-direction: column; align-items: center; 
+            min-height: 100vh; 
+            background: #ffffff; /* Sincronizado com cadastro */
+            color: #333; 
+            overflow-x: hidden; 
         }
 
-        /* SELETOR DE IDIOMA NO TOPO */
-        .language-header {
+        /* Nome da empresa no TOP */
+        .brand-top {
             width: 100%;
             max-width: 500px;
-            display: flex;
-            justify-content: flex-end;
-            padding: 15px;
-            z-index: 10;
-        }
-
-        .lang-select {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(5px);
-            border-radius: 8px;
-            padding: 8px;
-            font-size: 0.85rem;
-            outline: none;
-        }
-        
-        .lang-select option { color: #333; }
-
-        .header-logo {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 30px 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border-bottom: 1px solid var(--glass-border);
-            margin-bottom: 20px;
-        }
-
-        .header-logo img {
-            height: 110px;
-            width: auto;
-            object-fit: contain;
-            filter: drop-shadow(0 0 10px rgba(0,0,0,0.2));
-        }
-
-        .platform-text {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #fff;
-            margin-top: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .login-container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            padding: 40px 25px;
-            width: 100%;
-            max-width: 500px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            text-align: center;
-            border: 1px solid var(--glass-border);
-            border-radius: 20px 20px 0 0;
-        }
-
-        h2 {
-            font-size: 1.4rem;
-            margin-bottom: 25px;
-            color: var(--primary-blue);
-            font-weight: 700;
-        }
-
-        .form-group {
-            margin-bottom: 22px;
+            padding: 20px;
             text-align: left;
         }
-
-        .form-group label {
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            display: block;
-            color: #222;
-            text-transform: uppercase;
+        .brand-top h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #ff0000; 
+            letter-spacing: 2px;
         }
 
-        .input-wrapper {
+        /* Imagem de cabeçalho */
+        .header-image-container { 
+            width: 100%; 
+            max-width: 500px; 
+            height: 160px; 
+            overflow: hidden;
             position: relative;
-            display: flex;
-            align-items: center;
+        }
+        .header-image-container img { 
+            width: 100%; height: 100%; 
+            object-fit: cover; 
         }
 
-        .country-select-wrapper {
-            position: absolute;
-            left: 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding-right: 8px;
-            border-right: 1px solid #ddd;
-            z-index: 5;
+        /* Abas de navegação logo abaixo da imagem */
+        .auth-tabs-top { 
+            display: flex; width: 100%; max-width: 500px; 
+            background: #fff;
+            padding: 15px 10px;
+            gap: 10px;
+        }
+        .tab-btn { 
+            flex: 1; padding: 12px; 
+            text-align: center; text-decoration: none; 
+            font-weight: 700; font-size: 1rem; 
+            color: #003366; border-radius: 10px;
+            border: 2px solid #003366;
+            transition: 0.3s; 
+        }
+        .tab-btn.active { 
+            background: #003366; 
+            color: #fff; 
         }
 
-        .country-select-wrapper select {
-            background: transparent;
-            border: none;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--primary-blue);
-            cursor: pointer;
-            outline: none;
-            appearance: none;
-        }
-
-        .auth-form input {
-            width: 100%;
-            padding: 18px 15px 18px 95px;
-            border: 1.5px solid rgba(0,0,0,0.1);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.9);
-            font-size: 1rem;
-            color: #000;
-            transition: 0.3s;
-            outline: none;
-        }
-
-        .password-input {
-            padding-left: 55px !important;
-        }
-
-        .input-wrapper i.main-icon {
-            position: absolute;
-            left: 18px;
-            font-size: 1.2rem;
-            color: var(--primary-blue);
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 15px;
-            cursor: pointer;
-            color: #666;
-            z-index: 10;
-        }
-
-        .submit-button {
-            width: 100%;
-            padding: 20px;
-            border: none;
-            border-radius: 12px;
-            background: var(--primary-blue);
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            text-transform: uppercase;
-            box-shadow: 0 8px 15px rgba(0,85,164,0.3);
-        }
-
-        .auth-tabs-bottom {
-            display: flex;
+        .login-title {
             width: 100%;
             max-width: 500px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 0 0 20px 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            border: 1px solid var(--glass-border);
-            border-top: none;
-            margin-bottom: 40px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 22px;
+            padding: 10px 20px;
             text-align: center;
-            text-decoration: none;
+        }
+        .login-title h2 {
+            margin: 0;
+            color: #003366;
+            font-weight: 800;
+            font-size: 2.2rem;
+        }
+
+        /* Container do formulário */
+        .login-container { 
+            background: #fff; 
+            padding: 20px 0px; 
+            width: 100%; max-width: 500px; 
+        }
+
+        .form-group { margin-bottom: 25px; text-align: left; padding: 0 20px; }
+        
+        .form-group label { 
+            font-size: 0.85rem; font-weight: 700; 
+            margin-bottom: 8px; display: block; 
+            color: #555; text-transform: uppercase;
+        }
+
+        .input-wrapper { 
+            position: relative; 
+            display: flex; align-items: center; 
+        }
+
+        .auth-form input { 
+            width: 100%; 
+            padding: 18px 15px 18px 55px; 
+            border: 2px solid var(--input-border); 
+            border-radius: 12px; 
+            background: #fdfdfd; 
+            font-size: 1.1rem; color: #000; 
+            outline: none; transition: 0.3s; 
+        }
+
+        .auth-form input:focus { 
+            border-color: var(--input-focus); 
+            box-shadow: 0 0 0 4px rgba(0,102,204,0.1);
+        }
+
+        /* Indicador de Angola */
+        .country-fix {
+            position: absolute;
+            left: 15px;
             font-weight: 700;
-            font-size: 1.1rem;
-            color: #777;
-            background: rgba(0,0,0,0.05);
-            transition: 0.3s;
+            color: #000;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+        }
+        .input-phone { padding-left: 95px !important; }
+
+        .input-wrapper i.main-icon { 
+            position: absolute; left: 18px; 
+            font-size: 1.3rem; color: #999; 
         }
 
-        .tab-btn.active {
-            background: white;
-            color: var(--primary-blue);
-            border-top: 4px solid var(--primary-blue);
+        .toggle-password { 
+            position: absolute; right: 18px; 
+            cursor: pointer; color: #999; font-size: 1.2rem;
         }
 
-        @media (max-width: 500px) {
-            .login-container, .auth-tabs-bottom { width: 95%; }
+        .submit-button { 
+            width: 100%; padding: 20px; 
+            border: none; border-radius: 12px; 
+            background: #003366; 
+            color: white; font-size: 1.2rem; font-weight: 700; 
+            cursor: pointer; display: flex; justify-content: center; 
+            align-items: center; gap: 12px; 
+            margin-top: 20px;
+        }
+
+        @media (max-width: 500px) { 
+            .brand-top, .header-image-container, .auth-tabs-top, .login-title, .login-container { 
+                width: 100%; 
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="language-header">
-        <form action="{% url 'set_language' %}" method="post" id="lang-form">
-            {% csrf_token %}
-            <input name="next" type="hidden" value="{{ request.path }}">
-            <select name="language" class="lang-select" onchange="this.form.submit()">
-                {% get_current_language as CURRENT_LANG %}
-                <option value="pt" {% if CURRENT_LANG == 'pt' %}selected{% endif %}>Português 🇵🇹</option>
-                <option value="en" {% if CURRENT_LANG == 'en' %}selected{% endif %}>English 🇺🇸</option>
-                <option value="fr" {% if CURRENT_LANG == 'fr' %}selected{% endif %}>Français 🇫🇷</option>
-            </select>
-        </form>
+    <div class="brand-top">
+        <h1>AGROS</h1>
     </div>
 
-    <header class="header-logo">
-        <img src="{% static 'logo.png' %}" alt="angowork">
-        <div class="platform-text">{% trans "Plataforma de Rendimento online" %}</div>
-    </header>
+    <div class="header-image-container">
+        <img src="{% static 'logo_grande.png' %}" alt="Agros Banner">
+    </div>
+
+    <div class="auth-tabs-top">
+        <a href="#" class="tab-btn active">Login</a>
+        <a href="{% url 'cadastro' %}" class="tab-btn">{% trans "Cadastro" %}</a>
+    </div>
+
+    <div class="login-title">
+        <h2>Acesse sua conta</h2>
+    </div>
 
     <div class="login-container">
-        <h2>{% trans "Acesse sua conta" %}</h2>
-
-        <form method="post" class="auth-form">
+        <form method="post" class="auth-form" id="loginForm">
             {% csrf_token %}
-
+            
             <div class="form-group">
                 <label>{% trans "Número de Telefone" %}</label>
                 <div class="input-wrapper">
-                    <div class="country-select-wrapper">
-                        <span id="flag-display">🇦🇴</span>
-                        <select id="country-code" name="country_code">
-                            <option value="+244" data-flag="🇦🇴">+244</option>
-                            <option value="+351" data-flag="🇵🇹">+351</option>
-                            <option value="+55" data-flag="🇧🇷">+55</option>
-                            <option value="+1" data-flag="🇺🇸">+1</option>
-                        </select>
-                        <i class="fa-solid fa-caret-down" style="font-size: 0.7rem; color: #999;"></i>
+                    <div class="country-fix">
+                        <span>AO +244</span>
                     </div>
                     {{ form.username }}
                 </div>
@@ -277,24 +199,18 @@
             <div class="form-group">
                 <label>{% trans "Sua Senha" %}</label>
                 <div class="input-wrapper">
-                    <i class="fa-solid fa-key main-icon"></i>
-                    <div style="width: 100%;" class="pass-adjust">
-                        {{ form.password }}
-                    </div>
-                    <i class="fa-solid fa-eye-low-vision toggle-password" id="toggleLoginPass"></i>
+                    <i class="fa-solid fa-lock main-icon"></i>
+                    {{ form.password }}
+                    <i class="fa-solid fa-eye-slash toggle-password" id="toggleLoginPass"></i>
                 </div>
             </div>
-
-            <button type="submit" class="submit-button">
-                <span>{% trans "Entrar" %}</span>
-                <i class="fa-solid fa-right-to-bracket"></i>
-            </button>
+            
+            <div style="padding: 0 20px;">
+                <button type="submit" class="submit-button">
+                    <span>ENTRAR AGORA</span>
+                </button>
+            </div>
         </form>
-    </div>
-
-    <div class="auth-tabs-bottom">
-        <a href="#" class="tab-btn active">Login</a>
-        <a href="{% url 'cadastro' %}" class="tab-btn">{% trans "Cadastro" %}</a>
     </div>
 
     <script>
@@ -302,26 +218,21 @@
             const usernameInput = document.querySelector('input[name="username"]');
             const passwordInput = document.querySelector('input[name="password"]');
 
-            if(usernameInput) usernameInput.placeholder = '9xx xxx xxx';
+            if(usernameInput) {
+                usernameInput.placeholder = 'Número de 9 digitos';
+                usernameInput.classList.add('input-phone');
+                usernameInput.type = 'number';
+            }
             if(passwordInput) {
                 passwordInput.placeholder = '{% trans "Digite sua senha" %}';
-                passwordInput.classList.add('password-input');
             }
-
-            const countrySelect = document.getElementById('country-code');
-            const flagDisplay = document.getElementById('flag-display');
-
-            countrySelect.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                flagDisplay.textContent = selectedOption.getAttribute('data-flag');
-            });
 
             const toggleBtn = document.querySelector('#toggleLoginPass');
             if (toggleBtn && passwordInput) {
                 toggleBtn.addEventListener('click', function() {
                     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                     passwordInput.setAttribute('type', type);
-                    this.classList.toggle('fa-eye-low-vision');
+                    this.classList.toggle('fa-eye-slash');
                     this.classList.toggle('fa-eye');
                 });
             }

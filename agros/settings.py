@@ -1,5 +1,5 @@
 """
-Django settings for angowork project.
+Django settings for agros project.
 Configurado para Testagem Local e Produção no Render.com.
 """
 
@@ -30,10 +30,7 @@ if RENDER_EXTERNAL_HOSTNAME:
         ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # ADICIONADO: Seus domínios personalizados para produção
-ALLOWED_HOSTS.extend([
-    'angowork.art',
-    'www.angowork.art',
-    'angowork.onrender.com'
+ALLOWED_HOSTS.extend([*
 ])
 
 # Configuração de origens confiáveis para CSRF
@@ -67,7 +64,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'angowork.urls'
+ROOT_URLCONF = 'agros.urls'
 
 TEMPLATES = [
     {
@@ -86,7 +83,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'angowork.wsgi.application'
+WSGI_APPLICATION = 'agros.wsgi.application'
 
 # ======================================================================
 # DATABASE (SQLITE LOCAL / POSTGRES EM PRODUÇÃO)

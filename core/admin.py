@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe 
+from django.db import transaction
 from .models import (
     CustomUser, PlatformSettings, Level, BankDetails, Deposit, 
     Withdrawal, Task, Roulette, RouletteSettings, UserLevel, PlatformBankDetails
@@ -9,13 +10,26 @@ from .models import (
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('phone_number', 'available_balance', 'free_days_count', 'is_staff', 'is_active', 'date_joined')
+    # Adicionado campos de monitoramento na listagem
+    list_display = ('phone_number', 'available_balance', 'total_convidados', 'investidores_na_equipe', 'is_staff', 'is_active', 'date_joined')
     search_fields = ('phone_number', 'invite_code')
     list_filter = ('is_staff', 'is_active', 'level_active')
     ordering = ('-date_joined',)
-    list_editable = ('free_days_count',)
+    list_editable = ('available_balance',) # Permitir ajuste rápido se necessário
+    
+    readonly_fields = ('total_convidados', 'investidores_na_equipe', 'date_joined')
 
-# --- CONFIGURAÇÕES DE DEPÓSITO ---
+    def total_convidados(self, obj):
+        return CustomUser.objects.filter(invited_by=obj).count()
+    total_convidados.short_description = 'Convidados Totais'
+
+    def investidores_na_equipe(self, obj):
+        # Conta quantos convidados compraram pelo menos um nível
+        investidores = UserLevel.objects.filter(user__invited_by=obj).values('user').distinct().count()
+        return investidores
+    investidores_na_equipe.short_description = 'Investidores'
+
+# --- CONFIGURAÇÕES DE DEPÓSITO (LÓGICA DE SALDO ADICIONADA) ---
 
 @admin.register(Deposit)
 class DepositAdmin(admin.ModelAdmin):
@@ -36,6 +50,18 @@ class DepositAdmin(admin.ModelAdmin):
         }),
     )
 
+    def save_model(self, request, obj, form, change):
+        # Lógica para somar saldo automaticamente ao aprovar
+        if change: # Se o registro já existe e está sendo editado
+            old_obj = Deposit.objects.get(pk=obj.pk)
+            # Se não estava aprovado e agora foi marcado como aprovado
+            if not old_obj.is_approved and obj.is_approved:
+                with transaction.atomic():
+                    user = obj.user
+                    user.available_balance += obj.amount
+                    user.save()
+        super().save_model(request, obj, form, change)
+
     def proof_link(self, obj):
         if obj.proof_of_payment:
             return mark_safe(f'<a href="{obj.proof_of_payment.url}" target="_blank" style="color: #2e7d32; font-weight: bold;">Ver Imagem</a>')
@@ -53,11 +79,10 @@ class DepositAdmin(admin.ModelAdmin):
         return "Nenhum Comprovativo Carregado"
     current_proof_display.short_description = 'Foto do Comprovativo'
 
-# --- CONFIGURAÇÕES DE SAQUE (AQUI ESTÁ A MUDANÇA!) ---
+# --- CONFIGURAÇÕES DE SAQUE ---
 
 @admin.register(Withdrawal)
 class WithdrawalAdmin(admin.ModelAdmin):
-    # ADICIONADO: 'dados_bancarios_cliente' para aparecer na lista principal
     list_display = ('user', 'amount', 'status', 'dados_bancarios_cliente', 'created_at')
     search_fields = ('user__phone_number', 'withdrawal_details')
     list_filter = ('status', 'method', 'created_at')
@@ -74,11 +99,9 @@ class WithdrawalAdmin(admin.ModelAdmin):
             'fields': ('created_at',),
         }),
     )
-    # Criamos um campo de leitura para mostrar os dados do perfil do usuário
     readonly_fields = ('created_at', 'dados_completos_perfil')
 
     def dados_bancarios_cliente(self, obj):
-        # Tenta buscar o IBAN do modelo BankDetails ligado ao usuário
         try:
             return obj.user.bank_details.IBAN
         except:
@@ -86,7 +109,6 @@ class WithdrawalAdmin(admin.ModelAdmin):
     dados_bancarios_cliente.short_description = 'IBAN (Perfil)'
 
     def dados_completos_perfil(self, obj):
-        # Mostra todos os dados do banco dentro do formulário de edição
         try:
             dados = obj.user.bank_details
             return mark_safe(f"""

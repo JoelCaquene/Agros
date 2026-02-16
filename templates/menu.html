@@ -1,168 +1,82 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}ANGOWORK - Dashboard Profissional{% endblock %}
+{% block title %}agros - Dashboard Profissional{% endblock %}
 
 {% block content %}
-{# 1. MODAL DE BOAS-VINDAS PERSONALIZADO #}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+{# 1. POP-UP DE BOAS-VINDAS #}
 <div id="welcomeModal" class="modal-overlay">
-    <div class="modal-content-custom glass-effect animate-in">
-        <div class="modal-header-custom">
-            <h2 class="modal-logo">ANGOWORK</h2>
-            <p class="modal-subtitle">Informativo Oficial</p>
+    <div class="modal-content-white animate-in">
+        <div class="modal-header-img">
+            <button class="btn-x-close" onclick="closeModal()">×</button>
+            <img src="{% static 'images/banner_agro.jpg' %}" alt="Agros Top" style="width: 100%; height: 120px; object-fit: cover;">
         </div>
-        
-        <div class="modal-body-scroll">
-            <div class="info-item">
-                <i class="fas fa-calendar-alt"></i>
-                <p><strong>Horário:</strong> Segunda a Sábado (Domingo não prestamos serviços).</p>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-clock"></i>
-                <p><strong>Atendimento:</strong> 08:30 às 21:00.</p>
-            </div>
-            
-            <hr class="modal-divider">
-            
-            <div class="modal-text-content">
-                <p>Não somos uma plataforma de investimento, mas sim uma <strong>empresa de rendimento online</strong>.</p>
-                <p>O seu depósito servirá de garantia do seu compromisso com a empresa.</p>
-                <p>Após <strong>1 ano de serviço</strong> contínuo, o seu valor de garantia será totalmente reembolsado.</p>
-            </div>
-
-            <a href="{{ whatsapp_link }}" target="_blank" class="btn-whatsapp-custom">
-                <div class="whatsapp-icon-animate">
-                    <i class="fab fa-whatsapp"></i>
-                </div>
-                <span>ENTRAR NO GRUPO GERAL</span>
+        <div class="modal-body-clean">
+            <h2 class="modal-logo-blue">agros</h2>
+            <a href="{{ whatsapp_link }}" target="_blank" class="btn-whatsapp-new">
+                <i class="fab fa-whatsapp"></i>
+                <span>GRUPO WHATSAPP</span>
             </a>
-        </div>
-
-        <div class="modal-footer-custom">
-            <button class="btn-close-modal-new" onclick="closeModal()">CONCORDAR E CONTINUAR</button>
         </div>
     </div>
 </div>
 
 <div class="forex-dashboard">
     
-    {# TOPO SUPERIOR COM BOTÃO DE DOWNLOAD ADICIONADO #}
-    <div class="top-header">
-        <a href="{% url 'logout' %}" class="btn-sair-topo">SAIR</a>
-        <h1 class="logo-angowork">ANGOWORK</h1>
-        
-        <a href="{% static 'app/angowork.apk' %}" download class="btn-download-app">
-            <i class="fas fa-download"></i>
-            <span>APP</span>
-        </a>
-    </div>
-
-    {# PAINEL DE INDICADORES (6 INDICADORES) #}
-    <div class="indicators-grid glass-effect">
-        <div class="indicator-sq">
-            <span class="ind-label">Função</span>
-            <span class="ind-value">{% if active_level %}{{ active_level.level.name }}{% else %}Função 0{% endif %}</span>
-        </div>
-        <div class="indicator-sq">
-            <span class="ind-label">Saldo</span>
-            <span class="ind-value">KZ {{ user.available_balance|default:"0.00" }}</span>
-        </div>
-        <div class="indicator-sq">
-            <span class="ind-label">Garantia</span>
-            <span class="ind-value">KZ {{ approved_deposit_total|default:"0" }}</span>
-        </div>
-        
-        <div class="indicator-sq">
-            <span class="ind-label">HOJE</span>
-            <span class="ind-value">KZ {{ daily_income|default:"0.00" }}</span>
-        </div>
-        <div class="indicator-sq">
-            <span class="ind-label">Subsídios</span>
-            <span class="ind-value">KZ {{ user.subsidy_balance|default:"0.00" }}</span>
-        </div>
-        <div class="indicator-sq">
-            <span class="ind-label">SAQUES APROVADOS</span>
-            <span class="ind-value">KZ {{ total_withdrawals|default:"0.00" }}</span>
+    {# 2. TOPO COM NOME ANIMADO E BRILHO DOURADO #}
+    <div class="top-header-clean">
+        <div class="anim-container">
+            <h1 class="moving-name">agros</h1>
         </div>
     </div>
 
-    {# GRID DE AÇÕES #}
-    <div class="action-grid glass-effect">
-        <a href="{% url 'deposito' %}" class="action-item">
-            <div class="icon-box-dark"><i class="fas fa-piggy-bank"></i></div>
-            <span>Garantia</span>
-        </a>
-        <a href="{% url 'tarefa' %}" class="action-item">
-            <div class="icon-box-dark"><i class="fas fa-briefcase"></i></div>
-            <span>Actividade</span>
-        </a>
-        <a href="{% url 'nivel' %}" class="action-item">
-            <div class="icon-box-dark"><i class="fas fa-crown"></i></div>
-            <span>Função</span>
-        </a>
-        <a href="{% url 'sobre' %}" class="action-item">
-            <div class="icon-box-dark"><i class="fas fa-bullhorn"></i></div>
-            <span>Tutoria</span>
-        </a>
-        <a href="{% url 'saque' %}" class="action-item">
-            <div class="icon-box-dark"><i class="fas fa-hand-holding-dollar"></i></div>
-            <span>ATM</span>
-        </a>
+    {# 3. CARROSSEL DE IMAGENS (REDUZIDO ESPAÇAMENTO) #}
+    <div class="swiper main-carousel">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide"><img src="{% static 'images/slide1.jpg' %}" alt="Slide 1"></div>
+            <div class="swiper-slide"><img src="{% static 'images/slide2.jpg' %}" alt="Slide 2"></div>
+            <div class="swiper-slide"><img src="{% static 'images/slide3.jpg' %}" alt="Slide 3"></div>
+        </div>
+        <div class="swiper-pagination"></div>
     </div>
 
-    <div class="licenca-container" style="text-align: center; padding: 20px;">
-        <img src="{% static 'images/logo_isj.png' %}" alt="Logo ISJ" class="isj-logo" style="max-width: 80px; margin-bottom: 10px;">
-        
-        <p class="licenca-texto" style="font-weight: bold; color: #25D366; margin-bottom: 15px;">
-            <i class="fab fa-whatsapp"></i> SUPORTE WHATSAPP
-        </p>
-
-        <p style="margin-bottom: 10px;">
-            <a href="https://wa.me/15485642329" target="_blank" style="text-decoration: none; color: inherit; font-weight: 600;">
-                <i class="fas fa-external-link-alt" style="font-size: 0.8rem; opacity: 0.7;"></i> +1 (548) 871-5435
+    {# 4. PAINEL PRETO COM GRID DE AÇÕES #}
+    <div class="black-panel-container">
+        <div class="action-grid-clean">
+            <a href="{% url 'deposito' %}" class="action-item-new">
+                <div class="icon-box-shiny"><i class="fas fa-shield-halved"></i></div>
+                <span>Recarga</span>
             </a>
-        </p>
-
-        <p style="margin-bottom: 10px;">
-            <a href="https://wa.me/12496814350" target="_blank" style="text-decoration: none; color: inherit; font-weight: 600;">
-                <i class="fas fa-external-link-alt" style="font-size: 0.8rem; opacity: 0.7;"></i> +1 (548) 871-6128
+            <a href="{% url 'tarefa' %}" class="action-item-new">
+                <div class="icon-box-shiny"><i class="fas fa-laptop-code"></i></div>
+                <span>Produção</span>
             </a>
-        </p>
-
-        <p style="margin-bottom: 10px;">
-            <a href="https://wa.me/13436770920" target="_blank" style="text-decoration: none; color: inherit; font-weight: 600;">
-                <i class="fas fa-external-link-alt" style="font-size: 0.8rem; opacity: 0.7;"></i> +1 (548) 871-6128
+            <a href="{% url 'nivel' %}" class="action-item-new">
+                <div class="icon-box-shiny"><i class="fas fa-stairs"></i></div>
+                <span>VIP</span>
             </a>
-        </p>
-
-        <p style="margin-bottom: 10px;">
-            <a href="https://wa.me/13659088916" target="_blank" style="text-decoration: none; color: inherit; font-weight: 600;">
-                <i class="fas fa-external-link-alt" style="font-size: 0.8rem; opacity: 0.7;"></i> +1 (249) 528-2836
+            <a href="{% url 'perfil' %}" class="action-item-new">
+                <div class="icon-box-shiny"><i class="fas fa-building-columns"></i></div>
+                <span>Meus</span>
             </a>
-        </p>
+            <a href="{% url 'saque' %}" class="action-item-new">
+                <div class="icon-box-shiny"><i class="fas fa-money-check-dollar"></i></div>
+                <span>Saquês</span>
+            </a>
+        </div>
     </div>
 
-    {# BARRA INFERIOR #}
-    <div class="bottom-nav glass-effect">
-        <a href="{% url 'perfil' %}" class="action-item">
-            <div class="icon-box-black"><i class="fas fa-university"></i></div>
-            <span>IBAN</span>
-        </a>
-        <a href="{% url 'nivel' %}" class="action-item">
-            <div class="icon-box-black"><i class="fas fa-crown"></i></div>
-            <span>Função</span>
-        </a>
-        <a href="{% url 'roleta' %}" class="action-item">
-            <div class="icon-box-black btn-sorteio-anim"><i class="fas fa-dharmachakra"></i></div>
-            <span style="color: #ffcc00; font-weight: bold;">Sorteio</span>
-        </a>
-        <a href="{% url 'equipa' %}" class="action-item">
-            <div class="icon-box-black"><i class="fas fa-users"></i></div>
-            <span>Afiliados</span>
-        </a>
-        <a href="{% url 'change_password' %}" class="action-item">
-            <div class="icon-box-black"><i class="fas fa-user-shield"></i></div>
-            <span>Senha</span>
+    {# 5. ROLETA COM FOGOS DE ARTIFÍCIO #}
+    <div class="roleta-container">
+        <a href="{% url 'roleta' %}" class="roleta-glow-link">
+            <div class="roleta-spin-wrapper" id="roletaWrapper">
+                <img src="{% static 'images/roleta_img.png' %}" class="roleta-img-rotating" alt="Roleta">
+                <div class="roleta-center-text">SORTEIO</div>
+            </div>
         </a>
     </div>
 
@@ -170,126 +84,132 @@
 
 <style>
     :root {
-        --text-white: #ffffff;
-        --glass-bg: rgba(255, 255, 255, 0.08);
-        --blue-dark: #002d5e;
-        --black-pure: #000000;
-        --whatsapp-green: #25d366;
+        --bg-pure-white: #ffffff;
+        --shiny-gray: linear-gradient(145deg, #f9f9f9, #e0e0e0);
+        --blue-agros: #003366;
+        --gold-glow: 0 0 10px #ffd700, 0 0 20px #ff8c00;
     }
 
     html, body {
         margin: 0; padding: 0;
-        background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url("{% static 'background_cad.jpg' %}") no-repeat center center fixed;
-        background-size: cover;
+        background: var(--bg-pure-white) !important;
         font-family: 'Poppins', sans-serif;
-        color: white;
+        overflow-x: hidden;
     }
 
-    .forex-dashboard { width: 100%; max-width: 500px; margin: 0 auto; padding-bottom: 110px; }
+    .forex-dashboard { width: 100%; max-width: 500px; margin: 0 auto; padding-top: 5px; }
 
-    /* --- ESTILO DO BOTÃO DE DOWNLOAD (NOVO) --- */
-    .btn-download-app {
-        background: #3b82f6;
-        color: white;
-        padding: 5px 10px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 10px;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+    /* NOME ANIMADO COM SOMBRA DOURADA */
+    .top-header-clean { padding: 5px 15px; height: 40px; position: relative; }
+    .anim-container { position: relative; width: 100%; height: 100%; }
+    .moving-name {
+        position: absolute; font-weight: 900; font-size: 26px; 
+        color: var(--blue-agros);
+        text-shadow: var(--gold-glow);
+        animation: swingName 5s ease-in-out infinite alternate;
+        margin: 0;
+        text-transform: lowercase;
     }
-    .btn-download-app i { font-size: 12px; }
-
-    /* --- MODAL STYLE --- */
-    .modal-overlay { 
-        position: fixed; inset: 0; background: rgba(0,0,0,0.9); 
-        display: flex; justify-content: center; align-items: center; 
-        z-index: 10000; backdrop-filter: blur(8px); 
-    }
-    .modal-content-custom { 
-        width: 85%; max-width: 320px; max-height: 80vh; 
-        background: rgba(20, 20, 20, 0.95);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 25px; display: flex; flex-direction: column; overflow: hidden;
-    }
-    .animate-in { animation: modalShow 0.4s ease-out; }
-    @keyframes modalShow { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-
-    .modal-header-custom { padding: 20px 15px 10px; text-align: center; }
-    .modal-logo { font-size: 20px; font-weight: 900; letter-spacing: 2px; margin: 0; }
-    .modal-subtitle { font-size: 10px; color: #3b82f6; font-weight: bold; text-transform: uppercase; margin-top: 5px; }
-
-    .modal-body-scroll { padding: 15px 20px; overflow-y: auto; flex: 1; }
-    .modal-body-scroll::-webkit-scrollbar { width: 3px; }
-    .modal-body-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
-
-    .info-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .info-item i { color: #3b82f6; font-size: 14px; }
-    .info-item p { font-size: 12px; margin: 0; color: #ddd; }
-
-    .modal-divider { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0; }
-    .modal-text-content p { font-size: 12px; line-height: 1.6; color: #bbb; margin-bottom: 12px; text-align: center; }
-
-    /* WHATSAPP PERSONALIZADO */
-    .btn-whatsapp-custom { 
-        background: var(--whatsapp-green); color: white; text-decoration: none; 
-        padding: 12px; border-radius: 15px; display: flex; justify-content: center; 
-        align-items: center; gap: 10px; font-size: 11px; font-weight: bold; margin-top: 10px;
-        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
-    }
-    .whatsapp-icon-animate {
-        font-size: 18px;
-        animation: pulse-green 2s infinite;
-    }
-    @keyframes pulse-green {
-        0% { transform: scale(1); text-shadow: 0 0 0 rgba(255,255,255, 0.7); }
-        70% { transform: scale(1.2); text-shadow: 0 0 10px rgba(255,255,255, 0); }
-        100% { transform: scale(1); text-shadow: 0 0 0 rgba(255,255,255, 0); }
+    @keyframes swingName {
+        from { left: 0%; transform: scale(1); }
+        to { left: calc(100% - 85px); transform: scale(1.1); }
     }
 
-    .btn-close-modal-new { 
-        width: 100%; border: none; background: #fff; color: #000; 
-        padding: 14px; font-size: 12px; font-weight: 800; cursor: pointer;
+    /* CARROSSEL AJUSTADO PARA CIMA */
+    .main-carousel { width: 95%; height: 170px; border-radius: 15px; margin: 0 auto 10px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .main-carousel img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* PAINEL PRETO LIMITADO */
+    .black-panel-container {
+        background: #111111;
+        margin: 0 10px;
+        padding: 15px 5px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
+    .action-grid-clean {
+        display: grid; grid-template-columns: repeat(5, 1fr);
+        gap: 2px;
+    }
+    .action-item-new { display: flex; flex-direction: column; align-items: center; text-decoration: none; }
+    
+    /* BOTÕES CINZA BRILHANTE */
+    .icon-box-shiny {
+        width: 50px; height: 50px;
+        background: var(--shiny-gray);
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--blue-agros); font-size: 22px;
+        box-shadow: inset 2px 2px 5px #fff, 3px 3px 8px rgba(0,0,0,0.1);
+        margin-bottom: 6px;
+        transition: 0.3s;
+    }
+    .action-item-new span { font-size: 8px; font-weight: 800; color: #eee; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* --- DASHBOARD STYLE --- */
-    .top-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; }
-    .logo-angowork { font-weight: 900; font-size: 22px; color: #fff; }
-    .btn-sair-topo { background: #ff4444; color: white; padding: 5px 12px; border-radius: 6px; text-decoration: none; font-size: 10px; font-weight: bold; }
+    /* ROLETA E FOGOS */
+    .roleta-container { display: flex; justify-content: center; padding: 20px 0; position: relative; }
+    .roleta-spin-wrapper {
+        position: relative; width: 220px; height: 220px;
+        filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.4));
+    }
+    .roleta-img-rotating { width: 100%; height: 100%; animation: rotateFull 10s linear infinite; }
+    .roleta-center-text {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: linear-gradient(to bottom, #ffd700, #ff8c00); 
+        color: #000; padding: 10px 15px; border-radius: 25px;
+        font-weight: 900; font-size: 12px; border: 2px solid #fff;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    @keyframes rotateFull { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-    .indicators-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px; padding: 12px; border-radius: 15px; }
-    .indicator-sq { display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.05); padding: 12px 2px; border-radius: 10px; }
-    .ind-label { font-size: 7px; color: #aaa; text-transform: uppercase; margin-bottom: 4px; text-align: center; }
-    .ind-value { font-size: 9px; font-weight: bold; color: #fff; }
-
-    .action-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin: 15px 10px; padding: 15px 5px; border-radius: 15px; }
-    .icon-box-dark { width: 42px; height: 42px; background: var(--blue-dark); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; font-size: 18px; }
-
-    .licenca-container { margin: 20px 15px; padding: 15px; text-align: center; background: rgba(0,0,0,0.4); border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
-    .isj-logo { width: 70px; margin-bottom: 10px; opacity: 0.8; }
-    .licenca-texto { font-size: 9px; color: #aaa; line-height: 1.4; margin: 0; }
-
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); padding: 10px 5px; background: #000 !important; z-index: 999; border-radius: 20px 20px 0 0; }
-    .icon-box-black { width: 40px; height: 40px; background: #111; color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; font-size: 16px; border: 1px solid #222; }
-
-    .btn-sorteio-anim i { color: #ffcc00; animation: spin-slow 3s linear infinite; }
-    @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-    .action-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: white; }
-    .action-item span { font-size: 8px; font-weight: 500; text-transform: uppercase; }
-
-    .glass-effect { background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(5px); }
+    .modal-content-white { width: 300px; background: #fff; border-radius: 25px; overflow: hidden; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    .btn-x-close { position: absolute; top: 10px; right: 15px; background: rgba(0,0,0,0.5); border: none; font-size: 20px; color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; z-index: 11; }
+    .modal-logo-blue { color: var(--blue-agros); font-weight: 900; margin: 15px 0; }
+    .btn-whatsapp-new { background: #25d366; color: #fff; text-decoration: none; margin: 0 20px 20px; padding: 12px; border-radius: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 <script>
+    // Inicializar Carrossel
+    const swiper = new Swiper('.main-carousel', {
+        loop: true,
+        autoplay: { delay: 5000, disableOnInteraction: false },
+        pagination: { el: '.swiper-pagination', clickable: true },
+    });
+
+    // Função para Fogos de Artifício contínuos na roleta
+    function launchFireworks() {
+        const duration = 15 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+        function randomInRange(min, max) {
+          return Math.random() * (max - min) + min;
+        }
+
+        const interval = setInterval(function() {
+          const timeLeft = animationEnd - Date.now();
+          if (timeLeft <= 0) return clearInterval(interval);
+
+          const particleCount = 20 * (timeLeft / duration);
+          // Soltar das laterais da roleta
+          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+        }, 2000);
+    }
+
+    // Iniciar fogos ao carregar
+    window.onload = () => {
+        launchFireworks();
+        // Repetir fogos periodicamente
+        setInterval(launchFireworks, 16000);
+    };
+
     function closeModal() {
-        const modal = document.getElementById('welcomeModal');
-        modal.style.transition = 'opacity 0.3s ease';
-        modal.style.opacity = '0';
-        setTimeout(() => { modal.style.display = 'none'; }, 300);
+        document.getElementById('welcomeModal').style.opacity = '0';
+        setTimeout(() => { document.getElementById('welcomeModal').style.display = 'none'; }, 300);
     }
 </script>
 {% endblock %}

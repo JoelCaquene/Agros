@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Levantamento de Salário - ANGOWORK{% endblock %}
+{% block title %}Levantamento - agros{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -9,202 +9,243 @@
 <div class="withdraw-viewport">
     <div class="withdraw-dashboard">
         
-        {# BOTÃO VOLTAR E TÍTULO #}
+        {# 1. TOPO E TÍTULO #}
         <div class="top-nav-withdraw">
-            <a href="javascript:history.back()" class="btn-back-glass">
+            <a href="javascript:history.back()" class="btn-back-circle">
                 <i class="fas fa-arrow-left"></i>
             </a>
-            <span class="nav-title">CENTRO/SAQUÊ</span>
-        </div>
-        
-        {# HEADER COM SALDO E BOTÃO HISTÓRICO #}
-        <div class="premium-header-withdraw">
-            <div class="balance-display-glass">
-                <span class="label">SALDO</span>
-                <span class="value">{{ request.user.available_balance|default:"0" }} <small>KZ</small></span>
-            </div>
-            <button type="button" class="history-trigger" onclick="toggleHistory()">
-                <i class="fas fa-history"></i> HISTÓRICO
-            </button>
+            <span class="nav-title">Solicitar Saque</span>
         </div>
 
-        {# SEÇÃO DE HISTÓRICO (MODAL) #}
-        <div id="history-section" class="history-overlay glass-effect" style="display: none;">
-            <div class="history-header">
-                <h4>MEUS LEVANTAMENTOS</h4>
-                <button onclick="toggleHistory()" class="close-history">&times;</button>
-            </div>
-            <div class="history-list">
-                {% if withdrawal_records %}
-                    {% for w in withdrawal_records %}
-                    <div class="history-card {% if w.status == 'Aprovado' %}card-approved{% elif w.status == 'Pendente' %}card-pending{% else %}card-rejected{% endif %}">
-                        <div class="card-main">
-                            <span class="amount">{{ w.amount }} KZ</span>
-                            <span class="status-badge">{{ w.status|upper }}</span>
-                        </div>
-                        <div class="card-details">
-                            <p><i class="far fa-clock"></i> Solicitação: {{ w.created_at|date:"H:i - d/m" }}</p>
-                            {% if w.status == 'Aprovado' %}
-                                <p><i class="fas fa-check-double"></i> Aprovação: {{ w.updated_at|date:"H:i - d/m" }}</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="empty-msg">Nenhum registro encontrado.</p>
-                {% endif %}
-            </div>
-        </div>
-
-        {# CONTEÚDO PRINCIPAL #}
         <div class="main-withdraw-content">
-
             {% if messages %}
                 {% for message in messages %}
                     <div class="msg-alert {{ message.tags }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
 
-            {# LÓGICA DE INTERFACE BASEADA NO ESTADO DO SISTEMA #}
+            {# LÓGICA DE INTERFACE #}
             {% if is_sunday %}
-                {# MENSAGEM DE DOMINGO #}
-                <div class="glass-effect p-form error-time">
-                    <i class="fas fa-calendar-times" style="font-size: 3.5rem; color: #ffbb33; margin-bottom: 15px;"></i>
-                    <h3 style="color: #ffbb33;">SISTEMA FECHADO</h3>
-                    <p style="font-weight: bold;">Hoje é feriado, saque é só amanhã.</p>
+                {# TELA PROFISSIONAL DE FERIADO #}
+                <div class="holiday-container animate-in">
+                    <div class="holiday-card-ui">
+                        <div class="holiday-icon">
+                            <i class="fas fa-umbrella-beach"></i>
+                        </div>
+                        <h3>SISTEMA EM DESCANSO</h3>
+                        <p>Hoje é domingo e nossa equipe financeira está em período de folga.</p>
+                        <div class="next-open">
+                            <i class="far fa-calendar-check"></i>
+                            <span>Próxima abertura: Amanhã às 09:00</span>
+                        </div>
+                    </div>
                 </div>
 
-            {% elif is_time_to_withdraw %}
-                {# SISTEMA ABERTO (09:00 - 17:00 / SEG A SAB) #}
+            {% else %}
+                {# SISTEMA ABERTO OU FORA DE HORÁRIO (FORMULÁRIO SEMPRE VISÍVEL MAS CONDICIONADO) #}
                 <form method="post" id="form-saque">
                     {% csrf_token %}
                     <input type="hidden" name="withdrawal_method" value="BANCO"> 
-                    <div class="glass-effect p-form">
-                        <div class="amount-input-central">
-                            <label>VALOR DO SAQUE</label>
-                            <div class="input-container">
-                                <span class="currency">KZ</span>
-                                <input type="number" name="amount" id="id_amount" readonly required placeholder="0">
+                    
+                    <div class="withdraw-card-main">
+                        <div class="amount-entry-zone">
+                            <label class="entry-label">VALOR DO SAQUE</label>
+                            <div class="input-wrapper">
+                                <span class="prefix">KZ</span>
+                                <input type="number" name="amount" id="id_amount" required placeholder="0" min="2500" step="1">
                             </div>
-                            <div id="tax-info" class="tax-info-box" style="display:none;">
-                                <small>Taxa administrativa (15%): - <span id="tax-value">0</span> KZ</small><br>
-                                <strong>Receberá líquido: <span id="net-value">0</span> KZ</strong>
+                            
+                            <div id="tax-info" class="tax-info-box">
+                                <div class="tax-line"><span>Taxa (15%):</span> <span id="tax-value">0</span> KZ</div>
+                                <div class="net-line"><span>Receberá:</span> <span id="net-value">0</span> KZ</div>
                             </div>
                         </div>
 
-                        <div class="quick-values-grid">
-                            <button type="button" class="value-pill" onclick="setAmount(2500)">2.500</button>
-                            <button type="button" class="value-pill" onclick="setAmount(5000)">5.000</button>
-                            <button type="button" class="value-pill" onclick="setAmount(17000)">17.000</button>
-                            <button type="button" class="value-pill" onclick="setAmount(30000)">30.000</button>
-                            <button type="button" class="value-pill" onclick="setAmount(50000)">50.000</button>
-                            <button type="button" class="value-pill" onclick="setAmount(100000)">100.000</button>
-                            <button type="button" class="value-pill" onclick="setAmount(200000)">200.000</button>
-                            <button type="button" class="value-pill" onclick="setAmount(300000)">300.000</button>
-                            <button type="button" class="value-pill" onclick="setAmount(400000)">400.000</button>
-                            <button type="button" class="value-pill" onclick="setAmount(500000)">500.000</button>
-                            <button type="button" class="value-pill" onclick="setAmount(600000)">600.000</button>
-                            <button type="button" class="value-pill" onclick="setAmount(700000)">700.000</button>
+                        {# BOTÃO DE HISTÓRICO E SALDO ABAIXO DO INPUT #}
+                        <div class="info-row-below">
+                            <div class="balance-badge">
+                                <span class="b-label">DISPONÍVEL:</span>
+                                <span class="b-val">{{ request.user.available_balance|default:"0" }} KZ</span>
+                            </div>
+                            <button type="button" class="btn-history-round" onclick="toggleHistory()">
+                                <i class="fas fa-list-ul"></i> Transações
+                            </button>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-confirm-withdraw">
-                        SOLICITAR <i class="fas fa-check-circle"></i>
-                    </button>
+                    {% if is_time_to_withdraw %}
+                        <button type="submit" class="btn-confirm-primary">
+                            RETIRAR <i class="fas fa-chevron-right"></i>
+                        </button>
+                    {% else %}
+                        <div class="closed-notice">
+                            <i class="fas fa-lock"></i> Saques disponíveis das 09:00 às 17:00
+                        </div>
+                    {% endif %}
                 </form>
-            {% else %}
-                {# MENSAGEM FORA DO HORÁRIO #}
-                <div class="glass-effect p-form error-time">
-                    <i class="fas fa-clock" style="font-size: 3rem; color: #ff4444; margin-bottom: 15px;"></i>
-                    <h3>SISTEMA INDISPONÍVEL</h3>
-                    <p>Horário de levantamentos: <strong>Segunda a Sábado, das 09:00 às 17:00</strong>.</p>
+
+                {# RODAPÉ DE INSTRUÇÕES PROFISSIONAL #}
+                <div class="withdraw-rules">
+                    <div class="rule-item">
+                        <i class="fas fa-calendar-day"></i>
+                        <span><strong>DIAS:</strong> SEGUNDA A SÁBADO</span>
+                    </div>
+                    <div class="rule-item">
+                        <i class="fas fa-clock"></i>
+                        <span><strong>HORÁRIO:</strong> 09:00 ATÉ 17:00 H</span>
+                    </div>
+                    <div class="rule-item">
+                        <i class="fas fa-hand-holding-dollar"></i>
+                        <span><strong>MÍNIMO:</strong> 2500 KZ</span>
+                    </div>
+                    <div class="rule-item">
+                        <i class="fas fa-bolt"></i>
+                        <span><strong>PROCESSAMENTO:</strong> 0 A 48 HORAS</span>
+                    </div>
                 </div>
             {% endif %}
+        </div>
+
+        {# HISTÓRICO COM NOVO DESIGN DE CARDS #}
+        <div id="history-section" class="history-panel" style="display: none;">
+            <div class="history-header">
+                <h4>REGISTROS DE SAQUE</h4>
+                <button onclick="toggleHistory()" class="close-btn">&times;</button>
+            </div>
+            <div class="history-scroll">
+                {% if withdrawal_records %}
+                    {% for w in withdrawal_records %}
+                    <div class="record-card {% if w.status == 'Aprovado' %}approved-glow{% endif %}">
+                        <div class="record-top">
+                            <span class="record-id">ID: #{{ w.id|add:"1000" }}</span>
+                            <span class="record-status badge-{{ w.status|lower }}">{{ w.status }}</span>
+                        </div>
+                        <div class="record-body">
+                            <div class="record-amount">{{ w.amount }} <small>KZ</small></div>
+                            <div class="record-date">{{ w.created_at|date:"d/m/Y - H:i" }}</div>
+                        </div>
+                        {% if w.status == 'Aprovado' %}
+                        <div class="approved-tag"><i class="fas fa-check-circle"></i> SUCESSO</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <p>Sem transações recentes</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* RESET E LAYOUT */
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url("{% static 'background_cad.jpg' %}") no-repeat center center fixed; background-size: cover; color: white; font-family: 'Segoe UI', sans-serif; }
+    /* 2. ESTILO FUNDO BRANCO E LIMPO */
+    :root {
+        --primary-blue: #003366;
+        --accent-blue: #00a2ff;
+        --success-green: #2ecc71;
+        --text-dark: #333;
+        --text-light: #777;
+    }
 
-    .withdraw-viewport { width: 100%; display: flex; justify-content: center; min-height: 100vh; }
-    .withdraw-dashboard { width: 100%; max-width: 450px; padding: 15px; }
-
-    /* BOTÃO VOLTAR */
-    .top-nav-withdraw { display: flex; align-items: center; margin-bottom: 20px; padding: 5px 0; }
-    .btn-back-glass { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); }
-    .nav-title { margin-left: 15px; font-weight: 800; font-size: 1.1rem; letter-spacing: 1px; color: #00a2ff; }
-
-    .glass-effect { background: rgba(255, 255, 255, 0.07); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; }
-    .p-form { padding: 30px 15px; text-align: center; }
-
-    /* HEADER */
-    .premium-header-withdraw { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-    .balance-display-glass { background: rgba(0, 162, 255, 0.2); padding: 10px 15px; border-radius: 12px; border-left: 4px solid #00a2ff; }
-    .balance-display-glass .label { display: block; font-size: 9px; opacity: 0.7; letter-spacing: 1px; }
-    .balance-display-glass .value { font-size: 1.1rem; font-weight: 800; }
-
-    .history-trigger { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
-
-    /* HISTÓRICO MODAL */
-    .history-overlay { position: fixed; top: 12%; left: 5%; right: 5%; bottom: 10%; z-index: 999; display: flex; flex-direction: column; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
-    .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-    .close-history { background: #ff4444; border: none; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; }
-    .history-list { flex: 1; overflow-y: auto; }
-
-    /* CARDS HISTÓRICO */
-    .history-card { border-radius: 12px; padding: 12px; margin-bottom: 10px; border-left: 5px solid; text-align: left; }
-    .card-approved { background: rgba(46, 125, 50, 0.3); border-color: #2e7d32; }
-    .card-pending { background: rgba(198, 40, 40, 0.3); border-color: #c62828; }
-    .card-rejected { background: rgba(80, 80, 80, 0.3); border-color: #555; }
-    .card-main { display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-    .status-badge { font-size: 9px; padding: 3px 7px; background: rgba(0,0,0,0.3); border-radius: 4px; }
-    .card-details { font-size: 10px; opacity: 0.8; margin-top: 5px; }
-
-    /* TAXA BOX */
-    .tax-info-box { margin-top: 15px; padding: 10px; background: rgba(255, 166, 0, 0.1); border-radius: 10px; border: 1px dashed orange; color: #ffcc00; font-size: 12px; }
-
-    /* FORMULÁRIO */
-    .input-container { display: flex; align-items: center; justify-content: center; border-bottom: 2px solid #00a2ff; max-width: 180px; margin: 0 auto; }
-    .input-container input { background: transparent; border: none; color: white; font-size: 1.8rem; font-weight: 800; text-align: center; width: 100%; outline: none; }
-    .quick-values-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; }
-    .value-pill { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px 2px; border-radius: 10px; font-size: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .value-pill:active { background: #00a2ff; transform: scale(0.95); }
+    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
     
-    .btn-confirm-withdraw { width: 100%; margin-top: 20px; padding: 18px; border-radius: 15px; border: none; background: linear-gradient(to right, #0056b3, #00a2ff); color: white; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(0, 162, 255, 0.3); }
+    body { background: #ffffff !important; color: var(--text-dark); margin: 0; }
+
+    .withdraw-viewport { width: 100%; display: flex; justify-content: center; min-height: 100vh; background: #fff; }
+    .withdraw-dashboard { width: 100%; max-width: 480px; padding: 20px; }
+
+    /* TOPO */
+    .top-nav-withdraw { display: flex; align-items: center; margin-bottom: 25px; }
+    .btn-back-circle { width: 45px; height: 45px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-dark); text-decoration: none; transition: 0.3s; }
+    .nav-title { margin-left: 15px; font-weight: 700; font-size: 1.3rem; color: var(--primary-blue); }
+
+    /* CARD DE ENTRADA */
+    .withdraw-card-main { 
+        background: #fdfdfd; 
+        border: 1px solid #eee; 
+        border-radius: 25px; 
+        padding: 25px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
     
-    .msg-alert { padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; text-align: center; font-weight: 600; }
-    .msg-alert.error { background: rgba(255,0,0,0.2); color: #ffcccc; border: 1px solid rgba(255,0,0,0.3); }
-    .msg-alert.success { background: rgba(0,255,0,0.2); color: #ccffcc; border: 1px solid rgba(0,255,0,0.3); }
+    .entry-label { display: block; text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--text-light); margin-bottom: 15px; }
+    
+    .input-wrapper { display: flex; align-items: center; justify-content: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px; transition: 0.3s; }
+    .input-wrapper:focus-within { border-color: var(--accent-blue); }
+    .prefix { font-size: 1.5rem; font-weight: 800; color: var(--accent-blue); margin-right: 10px; }
+    .input-wrapper input { border: none; outline: none; background: transparent; font-size: 2.2rem; font-weight: 800; width: 100%; text-align: center; color: var(--primary-blue); }
+
+    /* 3. SALDO E TRANSAÇÕES ABAIXO */
+    .info-row-below { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f0f0f0; }
+    .balance-badge { background: #eef7ff; padding: 8px 15px; border-radius: 12px; }
+    .b-label { font-size: 9px; font-weight: 700; color: var(--accent-blue); display: block; }
+    .b-val { font-size: 0.95rem; font-weight: 700; color: var(--primary-blue); }
+    
+    .btn-history-round { background: #fff; border: 1px solid #ddd; padding: 8px 15px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text-dark); display: flex; gap: 8px; align-items: center; }
+
+    /* TAXA */
+    .tax-info-box { background: #fff9e6; border-radius: 15px; padding: 12px; font-size: 12px; }
+    .tax-line { color: #856404; display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .net-line { color: #155724; font-weight: 800; display: flex; justify-content: space-between; font-size: 14px; }
+
+    /* BOTÃO PRINCIPAL */
+    .btn-confirm-primary { width: 100%; padding: 20px; border-radius: 18px; border: none; background: var(--primary-blue); color: #fff; font-weight: 800; font-size: 1.1rem; cursor: pointer; box-shadow: 0 8px 20px rgba(0,51,102,0.2); transition: 0.3s; margin-top: 10px; }
+    .closed-notice { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 15px; text-align: center; font-weight: 700; font-size: 0.9rem; }
+
+    /* RODAPÉ DE REGRAS */
+    .withdraw-rules { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .rule-item { background: #fcfcfc; border: 1px solid #f0f0f0; padding: 12px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .rule-item i { font-size: 1.2rem; color: var(--accent-blue); margin-bottom: 8px; }
+    .rule-item span { font-size: 10px; color: var(--text-dark); line-height: 1.3; }
+
+    /* TELA DE FERIADO PROFISSIONAL */
+    .holiday-container { text-align: center; padding: 40px 20px; }
+    .holiday-card-ui { background: #fff; border: 2px solid #f0f0f0; border-radius: 30px; padding: 40px 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); }
+    .holiday-icon { width: 80px; height: 80px; background: #fff4e5; color: #ffa000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 20px; }
+    .next-open { margin-top: 25px; padding: 10px; background: #e8f5e9; color: #2e7d32; border-radius: 12px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 10px; }
+
+    /* 100% NOVO DESIGN DE REGISTRO DE SAQUE */
+    .record-card { background: #fff; border: 1px solid #eee; border-radius: 18px; padding: 15px; margin-bottom: 12px; position: relative; overflow: hidden; }
+    .approved-glow { border-color: #2ecc71; box-shadow: 0 0 15px rgba(46, 204, 113, 0.2); background: #f0fff4; }
+    .record-top { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .record-id { font-size: 10px; font-weight: 800; color: #999; }
+    .record-amount { font-size: 1.4rem; font-weight: 900; color: var(--primary-blue); }
+    .record-date { font-size: 10px; color: #aaa; }
+    .approved-tag { position: absolute; bottom: 10px; right: 10px; color: #27ae60; font-weight: 900; font-size: 9px; }
+
+    .badge-pendente { background: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; }
+    .badge-aprovado { background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; }
+
+    /* PAINEL DE HISTÓRICO */
+    .history-panel { position: fixed; bottom: 0; left: 0; right: 0; top: 0; background: #fff; z-index: 1000; padding: 20px; }
+    .history-scroll { height: calc(100vh - 100px); overflow-y: auto; padding-bottom: 50px; }
+    .close-btn { background: #f5f5f5; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; }
+
+    .animate-in { animation: fadeInUp 0.5s ease-out; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 <script>
-    function setAmount(val) {
-        const input = document.getElementById('id_amount');
-        input.value = val;
-        
-        // CÁLCULO VISUAL DA TAXA DE 15%
-        const taxBox = document.getElementById('tax-info');
-        const taxDisplay = document.getElementById('tax-value');
-        const netDisplay = document.getElementById('net-value');
-        
-        const tax = (val * 0.15).toFixed(0);
-        const net = (val - tax).toFixed(0);
-        
-        taxDisplay.innerText = Number(tax).toLocaleString('pt-PT');
-        netDisplay.innerText = Number(net).toLocaleString('pt-PT');
-        taxBox.style.display = 'block';
+    const amountInput = document.getElementById('id_amount');
+    const taxValue = document.getElementById('tax-value');
+    const netValue = document.getElementById('net-value');
 
-        const container = document.querySelector('.input-container');
-        container.style.borderColor = '#00ff88';
-        setTimeout(() => container.style.borderColor = '#00a2ff', 300);
-    }
+    amountInput.addEventListener('input', function() {
+        let val = parseFloat(this.value) || 0;
+        let tax = (val * 0.15).toFixed(0);
+        let net = (val - tax).toFixed(0);
+
+        taxValue.innerText = Number(tax).toLocaleString('pt-PT');
+        netValue.innerText = Number(net).toLocaleString('pt-PT');
+    });
 
     function toggleHistory() {
-        const hist = document.getElementById('history-section');
-        hist.style.display = (hist.style.display === 'none') ? 'flex' : 'none';
+        const panel = document.getElementById('history-section');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
     }
 </script>
 {% endblock %}

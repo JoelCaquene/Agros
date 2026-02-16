@@ -1,117 +1,136 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}ANGOWORK - Centro de Avaliações{% endblock %}
+{% block title %}AGROS - Produção de Leite{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<div class="work-wrapper" style="background: url('{% static 'images/bg-work.jpg' %}') no-repeat center center fixed; background-size: cover;">
+<div class="work-wrapper">
     <div class="glass-overlay"></div>
     
     <div class="work-container">
         
-        {# NOVO HEADER ESTILIZADO #}
+        {# HEADER PERSONALIZADO AGROS #}
         <div class="header-premium">
             <div class="brand-group">
-                <div class="logo-circle">AW</div>
+                <div class="logo-circle"><i class="fa-solid fa-cow"></i></div>
                 <div class="brand-text">
-                    <h1>ANGOWORK</h1>
-                    <p><i class="fa-solid fa-circle-check"></i> Parceiro Oficial de Marcas</p>
+                    <h1>AGROS MILK</h1>
+                    <p><i class="fa-solid fa- seedling"></i> Produção Sustentável</p>
                 </div>
             </div>
             <div class="badge-status {% if is_estagiario %}is-free{% endif %}">
-                {% if is_estagiario %}ESTAGIÁRIO{% else %}VIP GOLD{% endif %}
+                {% if is_estagiario %}ESTAGIÁRIO{% else %}PRODUTOR VIP{% endif %}
             </div>
         </div>
 
         {# CONTEÚDO PRINCIPAL #}
         <div class="content-body">
             
-            {# SEÇÃO 1: SELEÇÃO DE EMPRESAS (SLIDE) #}
+            {# SEÇÃO 1: SELEÇÃO DE VÍDEOS #}
             <div id="section-select" class="view-section">
-                <div class="task-info-card">
-                    <p>Escolha uma empresa para avaliar hoje e receba seu bônus.</p>
-                    {% if is_estagiario %}
-                    <div class="mini-alert">
-                        Ganho disponível: <strong>450 KZ</strong>
+                {% if is_sunday %}
+                    <div class="sunday-card">
+                        <div class="cow-icon-animation">🐄💤</div>
+                        <h3>Dia de Pasto</h3>
+                        <p>Aos Domingos, nossas vacas descansam e a produção para. Voltamos amanhã às 09:00!</p>
+                        <a href="{% url 'menu' %}" class="btn-back-home">Voltar ao Início</a>
                     </div>
-                    {% endif %}
-                </div>
+                {% else %}
+                    <div class="task-info-card">
+                        <p>Selecione um processo de produção para supervisionar hoje.</p>
+                        {% if is_estagiario %}
+                        <div class="mini-alert">Recompensa: <strong>500 KZ</strong></div>
+                        {% endif %}
+                    </div>
 
-                <div class="company-slider-container">
-                    {% if is_sunday %}
-                        <div class="sunday-card">
-                            <i class="fa-solid fa-mug-hot"></i>
-                            <h3>Domingo de Descanso</h3>
-                            <p>Nossos servidores estão em manutenção. Voltamos segunda-feira!</p>
-                        </div>
-                    {% else %}
-                        <div id="company-wrapper" class="company-wrapper">
-                            {% for company in companies %}
-                            <div class="company-card-premium" data-index="{{ forloop.counter0 }}" style="display: none;">
-                                <div class="comp-icon-box">
-                                    <i class="fa-solid {{ company.icon }}"></i>
-                                </div>
-                                <div class="comp-details">
-                                    <h3>{{ company.name }}</h3>
-                                    <span class="category">{{ company.category }}</span>
-                                    <p class="description">Empresa líder no setor, com mais de 10 anos de excelência em Angola.</p>
-                                </div>
-                                <button class="btn-start-eval">Avaliar Agora</button>
+                    <div class="video-grid">
+                        {# CARD VÍDEO 1 #}
+                        <div class="video-item" onclick="startVideo('leite_1.mp4', 'Extração Automatizada')">
+                            <div class="video-thumb">
+                                <i class="fa-solid fa-play"></i>
+                                <span class="duration">0:15</span>
                             </div>
-                            {% endfor %}
+                            <div class="video-meta">
+                                <h3>Extração Automatizada</h3>
+                                <span>Vídeo Educativo 01</span>
+                            </div>
                         </div>
 
-                        <div class="slider-controls">
-                            <button id="next-btn" class="btn-next">Próxima Empresa <i class="fa-solid fa-arrow-right"></i></button>
+                        {# CARD VÍDEO 2 #}
+                        <div class="video-item" onclick="startVideo('leite_2.mp4', 'Controle de Qualidade')">
+                            <div class="video-thumb">
+                                <i class="fa-solid fa-play"></i>
+                                <span class="duration">0:20</span>
+                            </div>
+                            <div class="video-meta">
+                                <h3>Controle de Qualidade</h3>
+                                <span>Vídeo Educativo 02</span>
+                            </div>
                         </div>
-                    {% endif %}
-                </div>
+
+                        {# CARD VÍDEO 3 #}
+                        <div class="video-item" onclick="startVideo('leite_3.mp4', 'Processamento UHT')">
+                            <div class="video-thumb">
+                                <i class="fa-solid fa-play"></i>
+                                <span class="duration">0:18</span>
+                            </div>
+                            <div class="video-meta">
+                                <h3>Processamento UHT</h3>
+                                <span>Vídeo Educativo 03</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
 
-            {# SEÇÃO 2: AVALIAÇÃO (GLASS TERMINAL) #}
-            <div id="section-rate" class="view-section" style="display: none;">
-                <div class="rating-box-glass">
-                    <h2 id="eval-name">Avaliação</h2>
-                    <p>Selecione o nível de satisfação:</p>
+            {# SEÇÃO 2: PLAYER DE VÍDEO #}
+            <div id="section-player" class="view-section" style="display: none;">
+                <div class="player-box-glass">
+                    <h2 id="video-title">Supervisionando...</h2>
+                    <div class="video-container-internal">
+                        <video id="main-video" width="100%" preload="auto">
+                            <source src="" type="video/mp4">
+                            Seu navegador não suporta vídeos.
+                        </video>
+                        <div id="video-overlay-lock">Assista até o final para ganhar</div>
+                    </div>
                     
-                    <div class="star-rating-v2">
-                        <i class="fa-solid fa-star star-btn" data-value="1"></i>
-                        <i class="fa-solid fa-star star-btn" data-value="2"></i>
-                        <i class="fa-solid fa-star star-btn" data-value="3"></i>
-                        <i class="fa-solid fa-star star-btn" data-value="4"></i>
-                        <i class="fa-solid fa-star star-btn" data-value="5"></i>
+                    <div id="progress-container">
+                        <div id="progress-bar"></div>
                     </div>
 
                     <div id="load-box" style="display: none;">
                         <div class="custom-loader"></div>
-                        <p>Sincronizando dados com o servidor...</p>
+                        <p>Validando supervisão...</p>
                     </div>
 
-                    <button id="final-submit" class="btn-confirm-eval" disabled>CONFIRMAR AVALIAÇÃO</button>
+                    <button id="final-submit" class="btn-confirm-eval" disabled>CONCLUIR TAREFA</button>
                 </div>
             </div>
 
-            {# SEÇÃO 3: FINALIZADO (BONECO DANÇANDO) #}
+            {# SEÇÃO 3: FINALIZADO #}
             <div id="section-done" class="view-section" style="display: none;">
                 <div class="success-screen">
-                    <img src="{% static 'images/done-anim.gif' %}" alt="Sucesso" class="dance-anim">
-                    <h2>Excelente Trabalho!</h2>
-                    <p>Sua avaliação foi processada com sucesso. O saldo já está na sua carteira.</p>
-                    <a href="{% url 'home' %}" class="btn-back">Voltar ao Painel</a>
+                    <div class="success-icon-check">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h2>Produção Concluída!</h2>
+                    <p>Você supervisionou a produção com sucesso. Seu bônus já foi creditado no saldo disponível.</p>
+                    <a href="{% url 'menu' %}" class="btn-back">Voltar ao Painel</a>
                 </div>
             </div>
 
         </div>
 
-        {# CARD DE PUBLICIDADE PREMIUM #}
+        {# PUBLICIDADE #}
         <div class="ads-card-premium">
-            <div class="ad-label">PUBLICIDADE</div>
-            <img src="{% static 'images/ad-premium.jpg' %}" alt="Ads">
-            <div class="ad-info">
-                <span>Anuncie aqui sua marca para milhares de usuários.</span>
+            <div class="ad-label">AGROS PUBLICIDADE</div>
+            <div class="ad-content-box">
+                <i class="fa-solid fa-truck-fast"></i>
+                <p>Logística Agros: Entregando leite fresco em toda Angola.</p>
             </div>
         </div>
 
@@ -119,117 +138,99 @@
 </div>
 
 <style>
-    /* VARIÁVEIS E BASE */
     :root {
-        --glass: rgba(255, 255, 255, 0.15);
-        --glass-border: rgba(255, 255, 255, 0.3);
-        --gold: #ffcc00;
-        --success: #00ff88;
+        --primary: #2d5a27; /* Verde Agro */
+        --accent: #ffcc00; /* Amarelo */
+        --glass: rgba(255, 255, 255, 0.12);
+        --glass-border: rgba(255, 255, 255, 0.2);
     }
 
-    .work-wrapper { min-height: 100vh; position: relative; display: flex; justify-content: center; padding: 20px 0; }
-    .glass-overlay { position: absolute; top:0; left:0; width: 100%; height: 100%; background: rgba(0, 15, 30, 0.7); backdrop-filter: blur(8px); z-index: 1; }
-    .work-container { position: relative; z-index: 2; width: 95%; max-width: 450px; display: flex; flex-direction: column; gap: 20px; }
+    .work-wrapper { 
+        min-height: 100vh; 
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{% static "images/farm-bg.jpg" %}') center/cover;
+        display: flex; justify-content: center; padding: 20px 0; font-family: 'Poppins', sans-serif;
+    }
+    .work-container { width: 95%; max-width: 450px; position: relative; z-index: 5; }
 
     /* HEADER */
-    .header-premium { background: var(--glass); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; }
-    .logo-circle { width: 45px; height: 45px; background: white; color: #003366; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
-    .brand-text h1 { color: white; font-size: 18px; margin: 0; }
-    .brand-text p { color: var(--gold); font-size: 10px; margin: 0; text-transform: uppercase; }
-    .badge-status { background: var(--success); color: #003366; padding: 5px 12px; border-radius: 10px; font-size: 11px; font-weight: 800; }
-    .badge-status.is-free { background: var(--gold); }
+    .header-premium { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); padding: 15px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
+    .logo-circle { width: 45px; height: 45px; background: white; color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .brand-text h1 { color: white; font-size: 18px; margin: 0; font-weight: 700; }
+    .brand-text p { color: var(--accent); font-size: 10px; margin: 0; }
+    .badge-status { background: #fff; color: var(--primary); padding: 5px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; }
+    .badge-status.is-free { background: var(--accent); }
 
-    /* TASK INFO & CARDS */
-    .task-info-card { text-align: center; color: white; font-size: 13px; margin-bottom: 20px; }
-    .mini-alert { background: rgba(255,204,0,0.2); border: 1px solid var(--gold); display: inline-block; padding: 5px 15px; border-radius: 15px; margin-top: 10px; }
+    /* VIDEO GRID */
+    .video-grid { display: flex; flex-direction: column; gap: 15px; }
+    .video-item { background: white; border-radius: 18px; display: flex; padding: 10px; gap: 15px; cursor: pointer; transition: 0.3s; }
+    .video-item:active { transform: scale(0.97); }
+    .video-thumb { width: 100px; height: 70px; background: #222; border-radius: 12px; display: flex; align-items: center; justify-content: center; position: relative; color: white; }
+    .duration { position: absolute; bottom: 5px; right: 5px; font-size: 9px; background: rgba(0,0,0,0.7); padding: 2px 5px; border-radius: 4px; }
+    .video-meta h3 { margin: 0; font-size: 15px; color: #333; }
+    .video-meta span { font-size: 12px; color: #777; }
 
-    .company-card-premium { background: white; border-radius: 25px; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: slideIn 0.5s ease; margin-bottom: 15px; }
-    .comp-icon-box { width: 70px; height: 70px; background: #f0f4f8; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 30px; color: #003366; }
-    .comp-details h3 { margin: 0; color: #333; }
-    .comp-details .category { color: #888; font-size: 12px; }
-    .comp-details .description { font-size: 12px; color: #666; margin: 15px 0; line-height: 1.4; }
-    .btn-start-eval { width: 100%; background: #003366; color: white; border: none; padding: 12px; border-radius: 15px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+    /* PLAYER */
+    .player-box-glass { background: var(--glass); backdrop-filter: blur(15px); padding: 20px; border-radius: 25px; border: 1px solid var(--glass-border); color: white; text-align: center; }
+    .video-container-internal { position: relative; border-radius: 15px; overflow: hidden; margin: 15px 0; background: #000; }
+    #video-overlay-lock { position: absolute; top: 10px; right: 10px; font-size: 10px; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 5px; }
+    #progress-container { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-bottom: 20px; overflow: hidden; }
+    #progress-bar { width: 0%; height: 100%; background: var(--accent); transition: 0.1s; }
 
-    .slider-controls { display: flex; justify-content: center; margin-top: 10px; }
-    .btn-next { background: var(--glass); border: 1px solid var(--glass-border); color: white; padding: 10px 20px; border-radius: 30px; font-size: 13px; cursor: pointer; }
-
-    /* RATING GLASS */
-    .rating-box-glass { background: var(--glass); border: 1px solid var(--glass-border); padding: 40px 20px; border-radius: 30px; text-align: center; color: white; }
-    .star-rating-v2 { margin: 25px 0; font-size: 35px; color: rgba(255,255,255,0.2); }
-    .star-rating-v2 i.active { color: var(--gold); text-shadow: 0 0 15px var(--gold); }
-    .btn-confirm-eval { width: 100%; padding: 15px; border-radius: 15px; border: none; background: grey; color: white; font-weight: 700; }
-    .btn-confirm-eval.ready { background: var(--success); color: #003366; cursor: pointer; }
+    /* SUNDAY CARD */
+    .sunday-card { background: white; padding: 40px 20px; border-radius: 25px; text-align: center; }
+    .cow-icon-animation { font-size: 50px; margin-bottom: 10px; }
+    .btn-back-home { display: block; margin-top: 20px; background: var(--primary); color: white; padding: 12px; border-radius: 12px; text-decoration: none; font-weight: 600; }
 
     /* SUCCESS SCREEN */
-    .success-screen { text-align: center; color: white; }
-    .dance-anim { width: 180px; margin-bottom: 20px; }
-    .btn-back { display: inline-block; margin-top: 20px; color: var(--gold); text-decoration: none; border: 1px solid var(--gold); padding: 10px 25px; border-radius: 20px; }
+    .success-icon-check { font-size: 70px; color: #4CAF50; margin-bottom: 15px; }
+    .btn-back { display: inline-block; color: white; background: var(--primary); padding: 12px 30px; border-radius: 30px; text-decoration: none; margin-top: 20px; }
 
     /* ADS */
-    .ads-card-premium { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
-    .ad-label { font-size: 9px; color: white; opacity: 0.5; padding: 5px 15px; }
-    .ads-card-premium img { width: 100%; height: 120px; object-fit: cover; }
-    .ad-info { padding: 10px; color: white; font-size: 10px; text-align: center; }
+    .ads-card-premium { margin-top: 25px; background: var(--glass); border-radius: 15px; padding: 15px; border: 1px solid var(--glass-border); color: white; }
+    .ad-label { font-size: 8px; opacity: 0.6; margin-bottom: 8px; }
+    .ad-content-box { display: flex; align-items: center; gap: 15px; }
+    .ad-content-box i { font-size: 25px; color: var(--accent); }
+    .ad-content-box p { font-size: 11px; margin: 0; }
 
-    /* LOADER */
-    .custom-loader { width: 40px; height: 40px; border: 4px solid var(--glass-border); border-top-color: var(--success); border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
+    .btn-confirm-eval { width: 100%; padding: 15px; border-radius: 15px; border: none; background: #555; color: white; font-weight: 700; transition: 0.3s; }
+    .btn-confirm-eval.ready { background: var(--accent); color: #000; cursor: pointer; box-shadow: 0 5px 15px rgba(255,204,0,0.4); }
+    
+    .custom-loader { width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 10px auto; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    let currentIndex = 0;
-    const cards = document.querySelectorAll('.company-card-premium');
-    const totalCompanies = cards.length;
-
-    function updateSlider() {
-        cards.forEach(card => card.style.display = 'none');
-        // Exibe 2 por vez (ou 1 se for o último)
-        if(cards[currentIndex]) cards[currentIndex].style.display = 'block';
-        if(cards[currentIndex + 1]) cards[currentIndex + 1].style.display = 'block';
-    }
-
-    document.getElementById('next-btn').addEventListener('click', () => {
-        currentIndex += 2;
-        if (currentIndex >= totalCompanies) currentIndex = 0;
-        updateSlider();
-    });
-
-    // Inicializa o slider
-    updateSlider();
-
-    const btnEvals = document.querySelectorAll('.btn-start-eval');
-    const starBtns = document.querySelectorAll('.star-btn');
-    const finalSubmit = document.getElementById('final-submit');
     const sectionSelect = document.getElementById('section-select');
-    const sectionRate = document.getElementById('section-rate');
+    const sectionPlayer = document.getElementById('section-player');
     const sectionDone = document.getElementById('section-done');
-    const evalName = document.getElementById('eval-name');
+    const videoElem = document.getElementById('main-video');
+    const progressBar = document.getElementById('progress-bar');
+    const finalSubmit = document.getElementById('final-submit');
+    const videoTitle = document.getElementById('video-title');
 
+    // Se já completou hoje, mostra tela final
     if ({{ tasks_completed_today|default:0 }} >= 1) {
         showSection('done');
     }
 
-    btnEvals.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const company = btn.parentElement.querySelector('h3').innerText;
-            evalName.innerText = company;
-            showSection('rate');
-        });
-    });
+    window.startVideo = function(videoFile, title) {
+        videoTitle.innerText = title;
+        videoElem.src = "{% static 'videos/' %}" + videoFile;
+        showSection('player');
+        videoElem.play();
+    };
 
-    starBtns.forEach(star => {
-        star.addEventListener('click', function() {
-            const val = this.getAttribute('data-value');
-            starBtns.forEach(s => {
-                s.classList.remove('active');
-                if (s.getAttribute('data-value') <= val) s.classList.add('active');
-            });
+    videoElem.ontimeupdate = function() {
+        let percentage = (videoElem.currentTime / videoElem.duration) * 100;
+        progressBar.style.width = percentage + "%";
+        
+        if (percentage >= 99) {
             finalSubmit.disabled = false;
             finalSubmit.classList.add('ready');
-        });
-    });
+            finalSubmit.innerText = "COLETAR RECOMPENSA";
+        }
+    };
 
     finalSubmit.addEventListener('click', function() {
         this.style.display = 'none';
@@ -251,15 +252,15 @@ document.addEventListener("DOMContentLoaded", function() {
                     alert(data.message);
                     location.reload();
                 }
-            }, 2000);
+            }, 1500);
         });
     });
 
     function showSection(type) {
         sectionSelect.style.display = 'none';
-        sectionRate.style.display = 'none';
+        sectionPlayer.style.display = 'none';
         sectionDone.style.display = 'none';
-        if (type === 'rate') sectionRate.style.display = 'block';
+        if (type === 'player') sectionPlayer.style.display = 'block';
         else if (type === 'done') sectionDone.style.display = 'block';
         else sectionSelect.style.display = 'block';
     }

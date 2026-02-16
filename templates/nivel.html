@@ -1,83 +1,65 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Adquira Função - Profissional{% endblock %}
+{% block title %}Centro de Produção - agros{% endblock %}
 
 {% block content %}
-<div class="level-container">
+<div class="production-container">
     
-    {# Cabeçalho Estruturado #}
-    <div class="top-header-card">
-        <a href="{% url 'home' %}" class="back-arrow-only">
-            <i class="fas fa-arrow-left"></i>
+    {# 1. TÍTULO SIMPLIFICADO #}
+    <div class="production-header">
+        <a href="{% url 'home' %}" class="btn-back">
+            <i class="fas fa-chevron-left"></i>
         </a>
-        <div class="header-title-box">
-            <h1 class="main-title">ADQUIRA FUNÇÃO</h1>
-        </div>
-        <div class="header-spacer"></div>
+        <h1 class="page-title">CENTRO DE PRODUÇÃO</h1>
     </div>
 
-    {# Aviso de Compromisso e Garantia #}
-    <div class="job-notice-box">
-        <div class="notice-icon">
-            <i class="fas fa-user-check"></i>
-        </div>
-        <p class="notice-text">
-            O depósito realizado não é um simples investimento, é uma <strong>garantia de aquisição de vaga</strong>, marcando assim o seu compromisso com a empresa.
-        </p>
+    {# AVISO DE COMPROMISSO #}
+    <div class="simple-alert">
+        <p>A taxa de adesão garante a sua vaga e o compromisso contratual com a empresa.</p>
     </div>
 
-    {# Lista de Planos/Funções #}
-    <div class="level-list">
+    {# 2. LISTA DE NÍVEIS EM LINHA #}
+    <div class="levels-stack">
         {% for level in levels %}
-        <div class="level-card-premium {% if level.id in user_levels %}active-card{% endif %}">
+        <div class="line-card {% if level.id in user_levels %}active-border{% endif %}">
             
-            {# Parte Superior: Informações #}
-            <div class="card-main-content">
-                <div class="card-left">
-                    <div class="level-badge">
-                        <i class="fas fa-briefcase icon-level"></i>
-                        <span class="level-name">{{ level.name }}</span>
+            <div class="line-content">
+                {# VIP E RECARGA #}
+                <div class="col-main">
+                    <span class="vip-label">{{ level.name }}</span>
+                    <span class="price-val">Recarga: KZ {{ level.deposit_value }}</span>
+                </div>
+
+                {# GANHO E CONTRATO #}
+                <div class="col-stats">
+                    <div class="stat-item">
+                        <span class="s-label">Ganho Diário</span>
+                        <span class="s-value">KZ {{ level.daily_gain }}</span>
                     </div>
-                    <div class="price-tag">
-                        <span class="info-label">Taxa de Adesão</span>
-                        <span class="info-value text-gold">KZ {{ level.deposit_value }}</span>
+                    <div class="stat-item">
+                        <span class="s-label">Contrato</span>
+                        <span class="s-value">1 ANO</span>
                     </div>
                 </div>
 
-                <div class="card-center">
-                    <div class="stats-grid">
-                        <div class="stat-box">
-                            <span class="info-label">Salário Diário</span>
-                            <span class="info-value text-green">KZ {{ level.daily_gain }}</span>
+                {# BOTÃO DE AÇÃO #}
+                <div class="col-action">
+                    {% if level.id in user_levels %}
+                        {# Se já estiver ativo, apenas mostra o status sem link quebrado #}
+                        <div class="btn-status production-mode">
+                            PRODUÇÃO
                         </div>
-                        <div class="stat-box">
-                            <span class="info-label">Rendimento Mensal</span>
-                            <span class="info-value text-blue">KZ {{ level.monthly_gain }}</span>
-                        </div>
-                        <div class="stat-box">
-                            <span class="info-label">Vigência</span>
-                            <span class="info-value text-contract-green">CONTRATO 1 ANO</span>
-                        </div>
-                    </div>
+                    {% else %}
+                        <form method="post" action="{% url 'nivel' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="level_id" value="{{ level.id }}">
+                            <button type="submit" class="btn-status activate-mode">
+                                ACTIVAR
+                            </button>
+                        </form>
+                    {% endif %}
                 </div>
-            </div>
-
-            {# Parte Inferior: Botão/Ação #}
-            <div class="card-footer-action">
-                {% if level.id in user_levels %}
-                    <div class="status-active-banner">
-                        <i class="fas fa-user-tie"></i> FUNÇÃO ATRIBUÍDA COM SUCESSO
-                    </div>
-                {% else %}
-                    <form method="post" action="{% url 'nivel' %}" style="width: 100%;">
-                        {% csrf_token %}
-                        <input type="hidden" name="level_id" value="{{ level.id }}">
-                        <button type="submit" class="btn-activate-full">
-                            ADQUIRIR VAGA AGORA <i class="fas fa-check-double"></i>
-                        </button>
-                    </form>
-                {% endif %}
             </div>
         </div>
         {% endfor %}
@@ -85,198 +67,114 @@
 </div>
 
 <style>
-    /* BLOQUEIO DE ROLAGEM LATERAL */
-    html, body {
-        max-width: 100%;
-        overflow-x: hidden;
-        background-color: #f1f5f9 !important;
+    /* RESET E FUNDO BRANCO/LIMPO */
+    body {
+        background-color: #ffffff !important;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         margin: 0; padding: 0;
-        font-family: 'Inter', sans-serif;
     }
 
-    .level-container {
-        width: 100%;
-        max-width: 100vw;
-        padding: 10px 15px 100px 15px;
-        box-sizing: border-box;
+    .production-container {
+        padding: 20px 15px;
+        max-width: 500px;
+        margin: 0 auto;
     }
 
     /* HEADER */
-    .top-header-card {
+    .production-header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
+        gap: 15px;
     }
 
-    .back-arrow-only {
-        width: 42px; height: 42px;
-        display: flex; align-items: center; justify-content: center;
-        background: #fff; color: #1e293b;
-        border-radius: 12px; border: 1px solid #e2e8f0;
+    .btn-back {
+        color: #334155;
+        font-size: 1.2rem;
         text-decoration: none;
     }
 
-    .header-title-box {
-        background: #1e293b;
-        padding: 10px 20px;
-        border-radius: 10px;
-        flex-grow: 1;
-        margin: 0 12px;
-        text-align: center;
-    }
-
-    .main-title {
-        font-size: 14px; font-weight: 800;
-        color: #fff; margin: 0;
-        letter-spacing: 1px;
-    }
-
-    .header-spacer { width: 42px; }
-
-    /* AVISO DE COMPROMISSO */
-    .job-notice-box {
-        background: #fff;
-        border-left: 4px solid #2563eb;
-        padding: 12px 15px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-
-    .notice-icon {
-        font-size: 20px;
-        color: #2563eb;
-    }
-
-    .notice-text {
-        font-size: 11px;
-        color: #475569;
+    .page-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #1e293b;
         margin: 0;
-        line-height: 1.4;
     }
 
-    .notice-text strong { color: #1e293b; }
-
-    /* CARD DE FUNÇÃO */
-    .level-card-premium {
-        background: #fff;
-        border-radius: 16px;
-        margin-bottom: 15px;
+    .simple-alert {
+        background: #f8fafc;
+        padding: 10px 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    }
+
+    .simple-alert p {
+        margin: 0;
+        font-size: 11px;
+        color: #64748b;
+    }
+
+    /* CARDS EM LINHA */
+    .levels-stack {
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        gap: 10px;
     }
 
-    .active-card {
-        border: 2px solid #10b981;
+    .line-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 12px;
+        border: 1px solid #eee;
+    }
+
+    .active-border {
+        border-color: #10b981;
         background: #f0fdf4;
     }
 
-    .card-main-content {
+    .line-content {
         display: flex;
-        padding: 15px;
         align-items: center;
+        justify-content: space-between;
     }
 
-    .card-left {
-        flex: 1.2;
-        border-right: 1px solid #f1f5f9;
-        padding-right: 8px;
-    }
+    .col-main { flex: 1.2; display: flex; flex-direction: column; }
+    .vip-label { font-size: 14px; font-weight: 800; color: #1e293b; }
+    .price-val { font-size: 10px; color: #3b82f6; font-weight: 700; }
 
-    .card-center {
+    .col-stats {
         flex: 2;
-        padding-left: 10px;
-    }
-
-    .level-badge {
         display: flex;
-        align-items: center;
-        gap: 6px;
-        margin-bottom: 6px;
+        gap: 10px;
+        padding: 0 10px;
+        border-left: 1px solid #eee;
+        border-right: 1px solid #eee;
+        margin: 0 10px;
     }
 
-    .icon-level { color: #2563eb; font-size: 16px; }
-    .level-name { font-size: 15px; font-weight: 900; color: #0f172a; text-transform: uppercase; }
+    .stat-item { display: flex; flex-direction: column; }
+    .s-label { font-size: 8px; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
+    .s-value { font-size: 10px; color: #334155; font-weight: 700; }
 
-    .info-label { 
-        display: block;
-        font-size: 8.5px; 
-        color: #64748b; 
-        font-weight: 700; 
-        text-transform: uppercase; 
-        margin-bottom: 1px;
-    }
+    .col-action { flex: 1; }
 
-    .info-value { font-size: 13px; font-weight: 800; display: block; }
-    
-    .text-gold { color: #b45309; }
-    .text-green { color: #10b981; }
-    .text-blue { color: #2563eb; }
-    .text-contract-green { color: #059669; }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-
-    .stat-box:last-child {
-        grid-column: span 2;
-        background: #f8fafc;
-        padding: 4px;
-        border-radius: 6px;
-        margin-top: 4px;
-        border: 1px dashed #cbd5e1;
-    }
-
-    /* BOTÃO E RODAPÉ */
-    .card-footer-action {
-        padding: 0 15px 15px 15px;
-    }
-
-    .btn-activate-full {
-        width: 100%;
-        background: #2563eb;
-        color: white;
+    .btn-status {
+        padding: 10px 5px;
+        border-radius: 8px;
+        font-size: 10px;
+        font-weight: 800;
         border: none;
-        padding: 14px;
-        border-radius: 12px;
-        font-size: 13px;
-        font-weight: 800;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
-    }
-
-    .status-active-banner {
-        background: #10b981;
-        color: white;
+        width: 100%;
         text-align: center;
-        padding: 12px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 800;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
+        display: block;
     }
 
-    /* MOBILE ADJUSTS */
-    @media (max-width: 380px) {
-        .level-name { font-size: 13px; }
-        .info-value { font-size: 11.5px; }
-        .notice-text { font-size: 10px; }
-    }
+    .activate-mode { background: #1e293b; color: #fff; }
+    .production-mode { background: #10b981; color: #fff; }
+
+    form { margin: 0; }
 </style>
 {% endblock %}

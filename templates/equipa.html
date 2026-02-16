@@ -1,148 +1,225 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Minha Equipa | ANGOWORK{% endblock %}
+{% block title %}Minha Equipa | agros{% endblock %}
 
 {% block content %}
-<div class="forex-dashboard">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<div class="main-screen">
     
-    {# TOPO NAVEGAÇÃO #}
-    <div class="top-header">
-        <a href="{% url 'menu' %}" class="btn-sair-topo" style="background: rgba(255,255,255,0.1);"><i class="fas fa-chevron-left"></i> VOLTAR</a>
-        <h1 class="logo-angowork">EQUIPA</h1>
-        <div style="width: 80px;"></div>
-    </div>
+    {# CABEÇALHO LIMPO #}
+    <header class="app-header">
+        <a href="{% url 'menu' %}" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h1 class="header-title">Minha Equipa</h1>
+        <div style="width: 40px;"></div>
+    </header>
 
-{# RESUMO DA EQUIPA #}
-    <div class="indicators-grid glass-effect">
-        <div class="indicator-sq">
-            <span class="ind-label">TOTAL MEMBROS</span>
-            <span class="ind-value">{{ level_a_count }}</span>
-        </div>
-        <div class="indicator-sq">
-            <span class="ind-label">INVESTIDORES</span>
-            <span class="ind-value">{{ level_a_investors }}</span>
-        </div>
-        <div class="indicator-sq">
-            <span class="ind-label">MINHA COMISSÃO</span>
-            <span class="ind-value">KZ {{ user.subsidy_balance|default:"0,00" }}</span>
-        </div>
-    </div>
-
-    {# LINK DE CONVITE #}
-    <div class="action-grid glass-effect" style="display: block; padding: 15px;">
-        <span class="ind-label" style="margin-bottom: 10px; display: block;">Meu Link de Convite</span>
-        <div class="invite-share-box">
-            <span id="invite-link-text">{{ invite_link }}</span>
-            <button onclick="copyInvite()" id="btn-copy"><i class="fas fa-copy"></i></button>
-        </div>
-    </div>
-
-    {# LISTA DE AFILIADOS #}
-    <div class="list-container" style="margin: 10px;">
-        <h2 class="section-title">MEMBROS NÍVEL 1</h2>
+    <div class="content-body">
         
-        <div class="member-table-header">
-            <span>TELEFONE</span>
-            <span>PLANO</span>
-            <span style="text-align: right;">ESTADO</span>
-        </div>
+        {# ESTATÍSTICAS OCULTAS #}
+        <section class="stats-section">
+            <button onclick="toggleStats()" class="btn-reveal" id="toggleBtn">
+                <i class="fa-solid fa-chart-simple"></i>
+                <span>CLÍCA AQUI!</span>
+            </button>
 
-        {# LISTA ÚNICA: Todos os membros aparecem como Verificados #}
-        {% for member in level_a %}
-        <div class="member-row glass-effect border-done">
-            <div class="col-main">
-                <span class="m-phone">{{ member.phone_number }}</span>
+            <div id="stats-indicators" class="stats-grid" style="display: none;">
+                <div class="stat-item">
+                    <i class="fa-solid fa-users blue"></i>
+                    <span class="num">{{ level_a_count }}</span>
+                    <span class="lab">Membros</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fa-solid fa-user-check green"></i>
+                    <span class="num">{{ level_a_investors }}</span>
+                    <span class="lab">Investidores</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fa-solid fa-hand-holding-dollar gold"></i>
+                    <span class="num">KZ {{ user.subsidy_balance|default:"0,00" }}</span>
+                    <span class="lab">Comissão</span>
+                </div>
             </div>
-            <div class="col-plan">
-                {% with active_vips=member.userlevel_set.filter.first %}
-                    <span class="p-badge {% if active_vips %}is-vip{% endif %}">
-                        {% if active_vips %}{{ active_vips.level.name }}{% else %}Plano 0{% endif %}
-                    </span>
-                {% endwith %}
+        </section>
+
+        {# CONVITE #}
+        <section class="invite-area">
+            <div class="invite-card-white">
+                <div class="invite-text">
+                    <span class="tiny-label">SEU LINK DE CONVITE</span>
+                    <p id="invite-link-text">{{ invite_link }}</p>
+                </div>
+                <button onclick="copyInvite()" id="btn-copy" class="copy-btn">
+                    <i class="fa-solid fa-copy"></i>
+                </button>
             </div>
-            <div class="col-status">
-                <span class="status-done" style="color: #2ecc71;"><i class="fas fa-check-circle"></i> Verificado</span>
+        </section>
+
+        {# LISTAGEM DE MEMBROS #}
+        <section class="members-area">
+            <h2 class="list-title">Parceiros Nível 1</h2>
+            
+            <div class="list-container">
+                {% for member in level_a %}
+                <div class="member-card-new">
+                    <div class="m-avatar">
+                        <i class="fa-solid fa-circle-user"></i>
+                    </div>
+                    
+                    <div class="m-details">
+                        <span class="m-phone">{{ member.phone_number }}</span>
+                        
+                        {# LOGICA VIP/ESTÁGIO #}
+                        {% with active_vips=member.userlevel_set.filter.first %}
+                        <div class="m-badge {% if active_vips %}is-vip{% else %}is-stage{% endif %}">
+                            {% if active_vips %}
+                                <i class="fa-solid fa-crown"></i> {{ active_vips.level.name }}
+                            {% else %}
+                                <i class="fa-solid fa-leaf"></i> Estágio
+                            {% endif %}
+                        </div>
+                        {% endwith %}
+                    </div>
+
+                    <div class="m-earnings">
+                        <span class="e-label">TAREFA HOJE</span>
+                        
+                        {# LOGICA DE GANHOS SEM ERRO DE 'SET' #}
+                        <div class="e-value">
+                            {% if member.task_set.exists %}
+                                {% for task in member.task_set.all %}
+                                    {% if task.completed_at|date:"Y-m-d" == now|date:"Y-m-d" %}
+                                        <span class="val-success">KZ {{ task.earnings }}</span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <span class="val-fail"><i class="fa-solid fa-xmark"></i></span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-msg">
+                    <i class="fa-solid fa-user-slash"></i>
+                    <p>Nenhum membro na sua rede ainda.</p>
+                </div>
+                {% endfor %}
             </div>
-        </div>
-        {% empty %}
-        <div class="glass-effect" style="padding: 30px; text-align: center; border-radius: 15px;">
-            <p style="font-size: 12px; color: #aaa;">Sua lista de afiliados está vazia.</p>
-        </div>
-        {% endfor %}
+        </section>
     </div>
-
 </div>
 
 <style>
     :root {
-        --text-white: #ffffff;
-        --glass-bg: rgba(255, 255, 255, 0.08);
-        --blue-dark: #002d5e;
-        --black-pure: #000000;
-        --gold: #ffcc00;
-        --success: #2ecc71;
-        --danger: #e74c3c;
+        --dark: #1a1a1a;
+        --blue: #2563eb;
+        --gold: #d97706;
+        --green: #16a34a;
+        --gray: #f3f4f6;
     }
 
-    html, body {
-        margin: 0; padding: 0;
-        background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url("{% static 'background_cad.jpg' %}") no-repeat center center fixed;
-        background-size: cover;
-        font-family: 'Poppins', sans-serif;
-        color: white;
+    body {
+        background-color: #ffffff !important;
+        margin: 0; font-family: 'Plus Jakarta Sans', sans-serif;
+        color: var(--dark);
     }
 
-    .forex-dashboard { width: 100%; max-width: 500px; margin: 0 auto; padding-bottom: 50px; }
+    .main-screen { max-width: 480px; margin: 0 auto; min-height: 100vh; }
 
-    .glass-effect {
-        background: var(--glass-bg);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 15px;
+    /* HEADER */
+    .app-header {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 20px; border-bottom: 1px solid #f0f0f0;
     }
+    .back-link { font-size: 20px; color: var(--dark); text-decoration: none; }
+    .header-title { font-size: 18px; font-weight: 800; margin: 0; color: var(--dark); }
 
-    .border-done {
-        border-left: 3px solid var(--success) !important;
-        background: rgba(46, 204, 113, 0.05);
+    /* BOTÃO ESTATS */
+    .stats-section { padding: 20px; }
+    .btn-reveal {
+        width: 100%; border: none; padding: 15px; border-radius: 15px;
+        background: #f8fafc; color: var(--blue);
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+        font-weight: 700; cursor: pointer; border: 1px solid #e2e8f0;
     }
+    .stats-grid {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+        margin-top: 15px; animation: fadeIn 0.3s ease;
+    }
+    .stat-item {
+        background: white; padding: 15px 5px; border-radius: 15px;
+        text-align: center; border: 1px solid #f0f0f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .stat-item i { font-size: 18px; margin-bottom: 5px; display: block; }
+    .stat-item i.blue { color: var(--blue); }
+    .stat-item i.green { color: var(--green); }
+    .stat-item i.gold { color: var(--gold); }
+    .stat-item .num { display: block; font-weight: 800; font-size: 12px; }
+    .stat-item .lab { font-size: 9px; color: #9ca3af; font-weight: 600; }
 
-    .top-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; }
-    .logo-angowork { font-weight: 900; font-size: 20px; color: #fff; }
-    .btn-sair-topo { color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 10px; font-weight: bold; }
+    /* CONVITE */
+    .invite-area { padding: 0 20px 20px; }
+    .invite-card-white {
+        background: #ffffff; padding: 15px; border-radius: 18px;
+        display: flex; align-items: center; justify-content: space-between;
+        border: 1px solid #e5e7eb; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .tiny-label { font-size: 9px; font-weight: 800; color: #9ca3af; }
+    .invite-text p { font-size: 12px; font-weight: 700; color: var(--blue); margin: 3px 0 0; }
+    .copy-btn { background: var(--gray); border: none; padding: 10px; border-radius: 10px; color: var(--dark); cursor: pointer; }
 
-    .indicators-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px; padding: 12px; }
-    .indicator-sq { display: flex; flex-direction: column; align-items: center; text-align: center; background: rgba(255,255,255,0.05); padding: 10px 2px; border-radius: 10px; }
-    .ind-label { font-size: 8px; color: #aaa; text-transform: uppercase; }
-    .ind-value { font-size: 11px; font-weight: bold; color: #fff; margin-top: 4px; }
-
-    .invite-share-box { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 10px; }
-    #invite-link-text { font-size: 10px; color: #4facfe; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
-    #btn-copy { background: none; border: none; color: var(--gold); font-size: 16px; cursor: pointer; padding-left: 10px; }
-
-    .section-title { font-size: 12px; color: var(--gold); margin: 20px 5px 10px; letter-spacing: 1px; }
-    .member-table-header { display: flex; justify-content: space-between; padding: 0 10px 8px; font-size: 9px; color: #888; font-weight: bold; }
+    /* LISTA */
+    .members-area { padding: 0 20px; }
+    .list-title { font-size: 16px; font-weight: 800; margin-bottom: 15px; color: var(--dark); }
     
-    .member-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
-    .col-main { display: flex; flex-direction: column; flex: 1.5; }
-    .m-phone { font-size: 14px; font-weight: 600; color: #eee; }
+    .member-card-new {
+        display: flex; align-items: center; gap: 12px;
+        padding: 15px; background: white; border-radius: 20px;
+        margin-bottom: 12px; border: 1px solid #f3f4f6;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .m-avatar { font-size: 32px; color: #d1d5db; }
+    .m-details { flex: 1; }
+    .m-phone { display: block; font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    
+    .m-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+    .m-badge.is-vip { background: #fef3c7; color: #b45309; }
+    .m-badge.is-stage { background: #f3f4f6; color: #6b7280; }
 
-    .col-plan { flex: 1; text-align: center; }
-    .p-badge { font-size: 9px; padding: 3px 8px; border-radius: 5px; background: rgba(255,255,255,0.1); color: #ccc; }
-    .is-vip { background: rgba(255, 204, 0, 0.2); color: var(--gold); border: 1px solid rgba(255,204,0,0.3); }
+    .m-earnings { text-align: right; }
+    .e-label { font-size: 9px; font-weight: 700; color: #9ca3af; display: block; }
+    .val-success { color: var(--green); font-weight: 800; font-size: 12px; }
+    .val-fail { color: #ef4444; font-size: 14px; }
 
-    .col-status { flex: 1; text-align: right; }
-    .status-done { color: var(--success); font-size: 11px; font-weight: bold; }
+    .empty-msg { text-align: center; padding: 40px; color: #d1d5db; }
+    .empty-msg i { font-size: 40px; margin-bottom: 10px; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 <script>
+    function toggleStats() {
+        const stats = document.getElementById('stats-indicators');
+        const btn = document.getElementById('toggleBtn');
+        if (stats.style.display === 'none') {
+            stats.style.display = 'grid';
+            btn.innerHTML = '<i class="fa-solid fa-eye-slash"></i> <span>Ocultar Estatísticas</span>';
+        } else {
+            stats.style.display = 'none';
+            btn.innerHTML = '<i class="fa-solid fa-chart-simple"></i> <span>Estatísticas da Rede</span>';
+        }
+    }
+
     function copyInvite() {
         const text = document.getElementById('invite-link-text').innerText;
         navigator.clipboard.writeText(text).then(() => {
             const btn = document.getElementById('btn-copy');
-            btn.innerHTML = '<i class="fas fa-check"></i>';
-            setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i>'; }, 2000);
+            btn.innerHTML = '<i class="fa-solid fa-check" style="color: #16a34a;"></i>';
+            setTimeout(() => { btn.innerHTML = '<i class="fa-solid fa-copy"></i>'; }, 2000);
         });
     }
 </script>
